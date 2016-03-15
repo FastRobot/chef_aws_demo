@@ -53,5 +53,5 @@ $RECYCLE.BIN/
 
 # this project
 *.zip
-.idea
+.idea/*
 *.har
