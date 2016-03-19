@@ -64,7 +64,7 @@
       "Default": "5"
     },
     "IncludeWorkstationInstance": {
-      "Description": "Set this value to 'true' to include a Chef workstation. For Chef Server only, set to 'false'",
+      "Description": "A value of 'true' includes a Chef workstation. For Chef Server only, set to 'false'",
       "AllowedValues": [
         "true",
         "false"
@@ -431,20 +431,6 @@
               "i-install-chrome": {
                 "command": "c:\\tools\\ewmp.cmd choco install googlechrome --force -y"
               },
-              "j-new-admin": {
-                "command": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "powershell.exe -command c:\\cfn\\scripts\\New-LocalAdministrator.ps1 -Name chefadmin -Password ",
-                      {
-                        "Ref": "AdminPassword"
-                      }
-                    ]
-                  ]
-                },
-                "waitAfterCompletion": "0"
-              },
               "k-send-signal": {
                 "command": "powershell.exe -command Write-AWSQuickStartStatus",
                 "waitAfterCompletion": "0"
@@ -650,15 +636,6 @@
         ]
       },
       "Description": "Public DNS Name for the Chef Server, hit via https"
-    },
-    "ChefWorkStationDnsName": {
-      "Value": {
-        "Fn::GetAtt": [
-          "ChefWorkStation",
-          "PublicDnsName"
-        ]
-      },
-      "Description": "Public DNS Name for the Chef WorkStation, login via ssh with the ec2-user"
     }
   }
 }
