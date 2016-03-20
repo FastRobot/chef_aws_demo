@@ -92,82 +92,73 @@
   "Mappings": {
     "ChefAMI": {
       "eu-west-1": {
-        "5": "ami-c0b91cb3",
         "25": "ami-a23228ce",
         "50": "ami-f032289c",
-        "100": "ami-dbb91ca8",
+        "100": "ami-6ebd001d",
         "150": "ami-d0b81da3",
         "200": "ami-9d8520ee",
         "250": "ami-bb8025c8"
       },
       "ap-southeast-1": {
-        "5": "ami-41de1f22",
         "25": "ami-3acc0559",
         "50": "ami-adcd04ce",
-        "100": "ami-1fdc1d7c",
+        "100": "ami-cdcc05ae",
         "150": "ami-1bdf1e78",
         "200": "ami-18dc1d7b",
         "250": "ami-09e1206a"
       },
       "ap-southeast-2": {
-        "5": "ami-ab9ac3c8",
         "25": "ami-a67a5cc5",
         "50": "ami-997a5cfa",
-        "100": "ami-879dc4e4",
+        "100": "ami-b17d5bd2",
         "150": "ami-a498c1c7",
         "200": "ami-a69ac3c5",
         "250": "ami-fb91c898"
       },
       "eu-central-1": {
-        "5": "ami-80fdefec",
         "25": "ami-a23228ce",
         "50": "ami-f032289c",
-        "100": "ami-45fcee29",
+        "100": "ami-503d273c",
         "150": "ami-cbffeda7",
         "200": "ami-befdefd2",
         "250": "ami-2bffed47"
       },
       "ap-northeast-1": {
-        "5": "ami-3137155f",
         "25": "ami-5db0b133",
         "50": "ami-e3b1b08d",
-        "100": "ami-6d301203",
+        "100": "ami-712be51f",
         "150": "ami-1c301272",
         "200": "ami-0b371565",
         "250": "ami-d63614b8"
       },
       "us-east-1": {
-        "5": "ami-812d6aeb",
         "25": "ami-8e88b9e4",
         "50": "ami-f686b79c",
-        "100": "ami-3e2f6854",
+        "100": "ami-8589b8ef",
         "150": "ami-022d6a68",
         "200": "ami-0d296e67",
         "250": "ami-4037702a"
       },
       "sa-east-1": {
-        "5": "ami-55cd4839",
         "25": "ami-002caf6c",
         "50": "ami-1033b07c",
-        "100": "ami-57cd483b",
+        "100": "ami-1233b07e",
         "150": "ami-92cf4afe",
         "200": "ami-adc144c1",
         "250": "ami-69c84d05"
       },
       "us-west-1": {
-        "5": "ami-193c5579",
         "25": "ami-4d8dfc2d",
         "50": "ami-f48eff94",
-        "100": "ami-d73f56b7",
+        "100": "ami-7f8ffe1f",
         "150": "ami-e23f5682",
         "200": "ami-ea31588a",
         "250": "ami-173b5277"
       },
       "us-west-2": {
-        "5": "ami-e5e5f584",
         "25": "ami-087e9d68",
         "50": "ami-587d9e38",
-        "100": "ami-c5e4f4a4",
+        "100": "ami-387c9f58",
         "150": "ami-0de3f36c",
         "200": "ami-c9e3f3a8",
         "250": "ami-4be2f22a"
