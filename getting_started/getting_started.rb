@@ -52,7 +52,6 @@ data << ['commit','Sign In']
 print 'Attempting to post credentials to Chef Server...'
 res = client.post("#{chef_server_url}/login",data,extheaders)
 
-puts res.content
 if Nokogiri::HTML(res.content).xpath('//html/body').text != 'You are being redirected.'
   puts "FAILED."
   abort("Verify your login credentials with the Chef-Server (#{chef_server_url}/login)")
