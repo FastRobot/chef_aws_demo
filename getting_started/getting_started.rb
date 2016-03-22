@@ -6,7 +6,7 @@ require 'nokogiri'
 require 'httpclient'
 
 args = ARGV
-die('Error parsing arguments: Must be in order <chef_server_url> <org> <username> <password>') if args.length < 4
+abort('Error parsing arguments: Must be in order <chef_server_url> <org> <username> <password>') if args.length < 4
 chef_server_url = args[0] #'https://ec2-52-9-121-235.us-west-1.compute.amazonaws.com'
 org = args[1]             #'testorg'
 username = args[2]        #'chefuser'
@@ -49,12 +49,13 @@ data << ['username',username]
 data << ['password',password]
 data << ['commit','Sign In']
 
-put 'Attempting to post credentials to Chef Server...'
+print 'Attempting to post credentials to Chef Server...'
 res = client.post("#{chef_server_url}/login",data,extheaders)
 
-if res.status != '200'
+puts res.content
+if Nokogiri::HTML(res.content).xpath('//html/body').text != 'You are being redirected.'
   puts "FAILED."
-  die("Verify your login credentials with the Chef-Server (#{chef_server_url}/login)")
+  abort("Verify your login credentials with the Chef-Server (#{chef_server_url}/login)")
 end
 
 puts "SUCCESS!"
