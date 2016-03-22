@@ -53,7 +53,6 @@
     "ChefNodes": {
       "Description": "Select the number of nodes you want to support.",
       "AllowedValues": [
-        "5",
         "25",
         "100",
         "150",
@@ -61,7 +60,7 @@
         "250"
       ],
       "Type": "String",
-      "Default": "5"
+      "Default": "25"
     },
     "IncludeWorkstationInstance": {
       "Description": "A value of 'true' includes a Chef workstation. For Chef Server only, set to 'false'",
@@ -445,7 +444,7 @@
       "Properties": {
         "ImageId": {
           "Fn::FindInMap": [
-            "WIN2012R2AMI",
+            "Ubuntu1404AMI",
             {
               "Ref": "AWS::Region"
             },
