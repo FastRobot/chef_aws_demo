@@ -168,7 +168,7 @@
         "64": "ami-d05e75b8"
       },
       "us-west-2": {
-        "64": "ami-5189a661"
+        "64": "ami-21b85141"
       },
       "us-west-1": {
         "64": "ami-df6a8b9b"
@@ -353,95 +353,8 @@
               }
             }
           }
-        },
-        "Properties": {
-          "ImageId": {
-            "Fn::FindInMap": [
-              "Ubuntu1404AMI",
-              {
-                "Ref": "AWS::Region"
-              },
-              "64"
-            ]
-          },
-          "InstanceType": "t2.medium",
-          "SubnetId": {
-            "Ref": "SubnetId"
-          },
-          "Tags": [
-            {
-              "Key": "Name",
-              "Value": "ChefWorkStation"
-            }
-          ],
-          "BlockDeviceMappings": [
-            {
-              "DeviceName": "/dev/sda1",
-              "Ebs": {
-                "VolumeSize": "50",
-                "VolumeType": "gp2"
-              }
-            }
-          ],
-          "SecurityGroupIds": [
-            {
-              "Ref": "ChefWorkStationSecurityGroup"
-            }
-          ],
-          "KeyName": {
-            "Ref": "KeyPairName"
-          },
-          "UserData": {
-            "Fn::Base64": {
-              "Fn::Join": [
-                "",
-                [
-                  "#!/bin/bash -xe\n",
-                  "apt-get update\n",
-                  "apt-get -y install python-pip",
-                  "pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
-                  "cp /usr/local/init/ubuntu/cfn-hup /etc/init.d/cfn-hup \n",
-                  "chmod +x /etc/init.d/cfn-hup \n",
-                  "update-rc.d cfn-hup defaults \n ",
-                  "service cfn-hup start \n",
-                  "cfn-init -v",
-                  " --stack ",
-                  {
-                    "Ref": "AWS::StackId"
-                  },
-                  " --resource ChefWorkStation",
-                  " --configsets install_init ",
-                  " --region ",
-                  {
-                    "Ref": "AWS::Region"
-                  },
-                  "\n",
-                  "cfn-signal -e $? ",
-                  " --stack ",
-                  {
-                    "Ref": "AWS::StackId"
-                  },
-                  " --resource ChefWorkStation",
-                  " --region ",
-                  {
-                    "Ref": "AWS::Region"
-                  },
-                  "\n"
-                ]
-              ]
-            }
-          }
-        },
-        "CreationPolicy": {
-          "ResourceSignal": {
-            "Count": "1",
-            "Timeout": "PT30M"
-          }
         }
-      }
-    },
-    "ChefNode": {
-      "Type": "AWS::EC2::Instance",
+      },
       "Properties": {
         "ImageId": {
           "Fn::FindInMap": [
@@ -459,16 +372,71 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "NODE"
+            "Value": "ChefWorkStation"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": "50",
+              "VolumeType": "gp2"
+            }
           }
         ],
         "SecurityGroupIds": [
           {
-            "Ref": "ChefNodeSecurityGroup"
+            "Ref": "ChefWorkStationSecurityGroup"
           }
         ],
         "KeyName": {
           "Ref": "KeyPairName"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -xe\n",
+                "apt-get update\n",
+                "apt-get -y install python-pip",
+                "pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "cp /usr/local/init/ubuntu/cfn-hup /etc/init.d/cfn-hup \n",
+                "chmod +x /etc/init.d/cfn-hup \n",
+                "update-rc.d cfn-hup defaults \n ",
+                "service cfn-hup start \n",
+                "cfn-init -v",
+                " --stack ",
+                {
+                  "Ref": "AWS::StackId"
+                },
+                " --resource ChefWorkStation",
+                " --configsets install_init ",
+                " --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "cfn-signal -e $? ",
+                " --stack ",
+                {
+                  "Ref": "AWS::StackId"
+                },
+                " --resource ChefWorkStation",
+                " --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        }
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Count": "1",
+          "Timeout": "PT30M"
         }
       }
     },
@@ -515,50 +483,17 @@
           }
         ]
       }
-    },
-    "ChefNodeSecurityGroup": {
-      "Type": "AWS::EC2::SecurityGroup",
-      "Properties": {
-        "GroupDescription": "Enables SSH and HTTP Access to the Chef Node",
-        "VpcId": {
-          "Ref": "VPC"
-        },
-        "SecurityGroupIngress": [
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "22",
-            "ToPort": "22",
-            "CidrIp": {
-              "Ref": "RemoteAdminCIDR"
-            }
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "22",
-            "ToPort": "22",
-            "CidrIp": {
-              "Ref": "VPCCIDR"
-            }
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": "80",
-            "ToPort": "80",
-            "CidrIp": "0.0.0.0/0"
-          }
-        ]
-      }
     }
   },
-  "Outputs": {
-    "ChefServerDnsName": {
-      "Value": {
-        "Fn::GetAtt": [
-          "ChefServer",
-          "PublicDnsName"
-        ]
-      },
-      "Description": "Public DNS Name for the Chef Server, hit via https"
-    }
-  }
+"Outputs": {
+"ChefServerDnsName": {
+"Value": {
+"Fn::GetAtt": [
+"ChefServer",
+"PublicDnsName"
+]
+},
+"Description": "Public DNS Name for the Chef Server, hit via https"
+}
+}
 }
