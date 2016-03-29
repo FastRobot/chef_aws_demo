@@ -62,7 +62,7 @@
       "Type": "String",
       "Default": "25"
     },
-    "IncludeWorkstationInstance": {
+    "IncludeWorkstation": {
       "Description": "A value of 'true' includes a Chef workstation. For Chef Server only, set to 'false'",
       "AllowedValues": [
         "true",
@@ -82,7 +82,7 @@
     "WorkstationInstance": {
       "Fn::Equals": [
         {
-          "Ref": "IncludeWorkstationInstance"
+          "Ref": "IncludeWorkstation"
         },
         "true"
       ]
@@ -273,7 +273,7 @@
                 {
                   "Ref": "FirstName"
                 },
-                 " -l ",
+                " -l ",
                 {
                   "Ref": "LastName"
                 },
@@ -314,196 +314,129 @@
           },
           "setup": {
             "files": {
-              "c:\\cfn\\cfn-hup.conf": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "[main]\n",
-                      "stack=",
-                      {
-                        "Ref": "AWS::StackId"
-                      },
-                      "\n",
-                      "region=",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      "\n"
-                    ]
-                  ]
-                }
-              },
-              "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf": {
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
                     [
                       "[cfn-auto-reloader-hook]\n",
                       "triggers=post.update\n",
-                      "path=Resources.ChefWorkStation.Metadata.AWS::CloudFormation::Init\n",
-                      "action=cfn-init.exe -v -s ",
+                      "path=Resources.LaunchConfig.Metadata.AWS::CloudFormation::Init\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
                       {
                         "Ref": "AWS::StackId"
                       },
-                      " -r ChefWorkStation",
-                      " --region ",
+                      "         --resource LaunchConfig ",
+                      "         --region ",
                       {
                         "Ref": "AWS::Region"
                       },
-                      "\n"
+                      "\n",
+                      "runas=root\n"
                     ]
                   ]
                 }
-              },
-              "c:\\cfn\\scripts\\Unzip-Archive.ps1": {
-                "source": "https://s3.amazonaws.com/quickstart-reference/microsoft/utilities/latest/scripts/Unzip-Archive.ps1"
-              },
-              "c:\\cfn\\modules\\AWSQuickStart.zip": {
-                "source": "https://s3.amazonaws.com/quickstart-reference/microsoft/utilities/latest/modules/AWSQuickStart.zip"
-              },
-              "c:\\cfn\\downloads\\chefdk-0.9.0-1-x86.msi": {
-                "source": "https://opscode-omnibus-packages.s3.amazonaws.com/windows/2008r2/i386/chefdk-0.9.0-1-x86.msi"
-              },
-              "c:\\cfn\\downloads\\Git-2.6.2-64-bit.exe": {
-                "source": "https://github.com/git-for-windows/git/releases/download/v2.6.2.windows.1/Git-2.6.2-64-bit.exe"
-              },
-              "c:\\cfn\\scripts\\git.inf": {
-                "source": "https://s3.amazonaws.com/quickstart-reference/chef/chef-server/latest/scripts/git.inf"
-              },
-              "c:\\cfn\\downloads\\default.rb": {
-                "source": "https://s3.amazonaws.com/quickstart-reference/chef/chef-server/latest/scripts/default.rb"
-              },
-              "c:\\cfn\\scripts\\New-LocalAdministrator.ps1": {
-                "source": "https://s3.amazonaws.com/quickstart-reference/microsoft/utilities/latest/scripts/New-LocalAdministrator.ps1"
-              },
-              "c:\\cfn\\downloads\\index.html": {
-                "source": "https://s3.amazonaws.com/quickstart-reference/chef/chef-server/latest/scripts/index.html"
-              },
-              "c:\\cfn\\downloads\\Win8.1AndW2K12R2-KB3066437-x64.msu": {
-                "source": "https://download.microsoft.com/download/3/F/D/3FD04B49-26F9-4D9A-8C34-4533B9D5B020/Win8.1AndW2K12R2-KB3066437-x64.msu"
-              },
-              "c:/tools/ewmp.cmd": {
-                "content": "@ECHO OFF\nFOR /F \"tokens=3,*\" %%a IN ('REG QUERY \"HKLM\\System\\CurrentControlSet\\Control\\Session Manager\\Environment\" /v PATH') DO PATH %%a%%b\n%*"
               }
             },
-            "commands": {
-              "a-set-execution-policy": {
-                "command": "powershell.exe -command Set-ExecutionPolicy RemoteSigned -Force",
-                "waitAfterCompletion": "0"
-              },
-              "b-unpack-quickstart-module": {
-                "command": "powershell.exe -command c:\\cfn\\scripts\\Unzip-Archive.ps1 -Source c:\\cfn\\modules\\AWSQuickStart.zip -Destination C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\",
-                "waitAfterCompletion": "0"
-              },
-              "c-init-quickstart-module": {
-                "command": "powershell.exe -command New-AWSQuickStartWaitHandle -Handle ChefWorkStation",
-                "waitAfterCompletion": "0"
-              },
-              "d-install-chefdk": {
-                "command": "powershell.exe -command Start-Process msiexec.exe '/i C:\\cfn\\downloads\\chefdk-0.9.0-1-x86.msi /qn' -NoNewWindow -Wait",
-                "waitAfterCompletion": "0"
-              },
-              "e-install-git": {
-                "command": "powershell.exe -command Start-Process c:\\cfn\\downloads\\Git-2.6.2-64-bit.exe '/VERYSILENT /LOADINF=c:\\cfn\\scripts\\git.inf' -NoNewWindow -Wait",
-                "waitAfterCompletion": "0"
-              },
-              "f-install-wmf5": {
-                "command": "wusa.exe c:\\cfn\\downloads\\Win8.1AndW2K12R2-KB3066437-x64.msu /quiet /forcerestart",
-                "waitAfterCompletion": "forever"
-              },
-              "g-install-chocolatey": {
-                "command": "powershell -Command \"Invoke-Expression ((New-Object Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))\""
-              },
-              "h-install-notepad": {
-                "command": "c:\\tools\\ewmp.cmd choco install notepadplusplus.install --force -y"
-              },
-              "i-install-chrome": {
-                "command": "c:\\tools\\ewmp.cmd choco install googlechrome --force -y"
-              },
-              "k-send-signal": {
-                "command": "powershell.exe -command Write-AWSQuickStartStatus",
-                "waitAfterCompletion": "0"
-              }
-            },
+            "commands": {},
             "services": {
-              "windows": {
+              "sysvinit": {
                 "cfn-hup": {
                   "enabled": "true",
                   "ensureRunning": "true",
                   "files": [
-                    "c:\\cfn\\cfn-hup.conf",
-                    "c:\\cfn\\hooks.d\\cfn-auto-reloader.conf"
+                    "/etc/cfn/cfn-hup.conf",
+                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
                   ]
                 }
               }
             }
           }
-        }
-      },
-      "Properties": {
-        "ImageId": {
-          "Fn::FindInMap": [
-            "Ubuntu1404AMI",
+        },
+        "Properties": {
+          "ImageId": {
+            "Fn::FindInMap": [
+              "Ubuntu1404AMI",
+              {
+                "Ref": "AWS::Region"
+              },
+              "64"
+            ]
+          },
+          "InstanceType": "t2.medium",
+          "SubnetId": {
+            "Ref": "SubnetId"
+          },
+          "Tags": [
             {
-              "Ref": "AWS::Region"
-            },
-            "64"
-          ]
-        },
-        "InstanceType": "t2.medium",
-        "SubnetId": {
-          "Ref": "SubnetId"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "ChefWorkStation"
-          }
-        ],
-        "BlockDeviceMappings": [
-          {
-            "DeviceName": "/dev/sda1",
-            "Ebs": {
-              "VolumeSize": "50",
-              "VolumeType": "gp2"
+              "Key": "Name",
+              "Value": "ChefWorkStation"
+            }
+          ],
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/sda1",
+              "Ebs": {
+                "VolumeSize": "50",
+                "VolumeType": "gp2"
+              }
+            }
+          ],
+          "SecurityGroupIds": [
+            {
+              "Ref": "ChefWorkStationSecurityGroup"
+            }
+          ],
+          "KeyName": {
+            "Ref": "KeyPairName"
+          },
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Join": [
+                "",
+                [
+                  "#!/bin/bash -xe\n",
+                  "apt-get update\n",
+                  "apt-get -y install python-pip",
+                  "pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                  "cp /usr/local/init/ubuntu/cfn-hup /etc/init.d/cfn-hup \n",
+                  "chmod +x /etc/init.d/cfn-hup \n",
+                  "update-rc.d cfn-hup defaults \n ",
+                  "service cfn-hup start \n",
+                  "cfn-init -v",
+                  " --stack ",
+                  {
+                    "Ref": "AWS::StackId"
+                  },
+                  " --resource ChefWorkStation",
+                  " --configsets install_init ",
+                  " --region ",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "\n",
+                  "cfn-signal -e $? ",
+                  " --stack ",
+                  {
+                    "Ref": "AWS::StackId"
+                  },
+                  " --resource ChefWorkStation",
+                  " --region ",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "\n"
+                ]
+              ]
             }
           }
-        ],
-        "SecurityGroupIds": [
-          {
-            "Ref": "ChefWorkStationSecurityGroup"
-          }
-        ],
-        "KeyName": {
-          "Ref": "KeyPairName"
         },
-        "UserData": {
-          "Fn::Base64": {
-            "Fn::Join": [
-              "",
-              [
-                "<script>\n",
-                "cfn-init.exe -v -c config -s ",
-                {
-                  "Ref": "AWS::StackId"
-                },
-                " -r ChefWorkStation",
-                " --region ",
-                {
-                  "Ref": "AWS::Region"
-                },
-                "\n",
-                "</script>\n"
-              ]
-            ]
+        "CreationPolicy": {
+          "ResourceSignal": {
+            "Count": "1",
+            "Timeout": "PT30M"
           }
-        }
-      },
-      "CreationPolicy": {
-        "ResourceSignal": {
-          "Count": "1",
-          "Timeout": "PT30M"
         }
       }
     },
