@@ -305,56 +305,7 @@
     "ChefWorkStation": {
       "Type": "AWS::EC2::Instance",
       "Condition": "WorkstationInstance",
-      "Metadata": {
-        "AWS::CloudFormation::Init": {
-          "configSets": {
-            "config": [
-              "setup"
-            ]
-          },
-          "setup": {
-            "files": {
-              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "[cfn-auto-reloader-hook]\n",
-                      "triggers=post.update\n",
-                      "path=Resources.LaunchConfig.Metadata.AWS::CloudFormation::Init\n",
-                      "action=/opt/aws/bin/cfn-init -v ",
-                      "         --stack ",
-                      {
-                        "Ref": "AWS::StackId"
-                      },
-                      "         --resource LaunchConfig ",
-                      "         --region ",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      "\n",
-                      "runas=root\n"
-                    ]
-                  ]
-                }
-              }
-            },
-            "commands": {},
-            "services": {
-              "sysvinit": {
-                "cfn-hup": {
-                  "enabled": "true",
-                  "ensureRunning": "true",
-                  "files": [
-                    "/etc/cfn/cfn-hup.conf",
-                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
-                  ]
-                }
-              }
-            }
-          }
-        }
-      },
+      "DependsOn": "WaitForChefServerInstall",
       "Properties": {
         "ImageId": {
           "Fn::FindInMap": [
@@ -399,44 +350,10 @@
               [
                 "#!/bin/bash -xe\n",
                 "apt-get update\n",
-                "apt-get -y install python-pip \n",
-                "pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz \n",
-                "cp /usr/local/init/ubuntu/cfn-hup /etc/init.d/cfn-hup \n",
-                "chmod +x /etc/init.d/cfn-hup \n",
-                "update-rc.d cfn-hup defaults \n ",
-                "service cfn-hup start \n",
-                "cfn-init -v",
-                " --stack ",
-                {
-                  "Ref": "AWS::StackId"
-                },
-                " --resource ChefWorkStation",
-                " --configsets install_init ",
-                " --region ",
-                {
-                  "Ref": "AWS::Region"
-                },
-                "\n",
-                "cfn-signal -e $? ",
-                " --stack ",
-                {
-                  "Ref": "AWS::StackId"
-                },
-                " --resource ChefWorkStation",
-                " --region ",
-                {
-                  "Ref": "AWS::Region"
-                },
-                "\n"
+                "echo done dude"
               ]
             ]
           }
-        }
-      },
-      "CreationPolicy": {
-        "ResourceSignal": {
-          "Count": "1",
-          "Timeout": "PT30M"
         }
       }
     },
