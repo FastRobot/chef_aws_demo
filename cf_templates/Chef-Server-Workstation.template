@@ -218,6 +218,21 @@
       "Properties": {
       }
     },
+    "WaitForChefWorkstationInstall": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "DependsOn": "ChefWorkstation",
+      "Properties": {
+        "Handle": {
+          "Ref": "WaitForChefWorkstationWaitHandle"
+        },
+        "Timeout": "2700"
+      }
+    },
+    "WaitForChefWorkstationWaitHandle": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle",
+      "Properties": {
+      }
+    },
     "ChefServer": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
@@ -302,7 +317,7 @@
         }
       }
     },
-    "ChefWorkStation": {
+    "ChefWorkstation": {
       "Type": "AWS::EC2::Instance",
       "Condition": "WorkstationInstance",
       "DependsOn": "WaitForChefServerInstall",
@@ -323,7 +338,7 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": "ChefWorkStation"
+            "Value": "ChefWorkstation"
           }
         ],
         "BlockDeviceMappings": [
@@ -337,7 +352,7 @@
         ],
         "SecurityGroupIds": [
           {
-            "Ref": "ChefWorkStationSecurityGroup"
+            "Ref": "ChefWorkstationSecurityGroup"
           }
         ],
         "KeyName": {
@@ -350,7 +365,13 @@
               [
                 "#!/bin/bash -xe\n",
                 "apt-get update\n",
-                "echo done dude"
+                "echo new stuff goes here\n",
+                "curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ChefWorkstation\", \"Data\" : \"Done\"}' \"",
+                {
+                  "Ref": "WaitForChefWorkstationWaitHandle"
+                },
+                "\" \n",
+                "echo done dude\n"
               ]
             ]
           }
@@ -382,7 +403,7 @@
         ]
       }
     },
-    "ChefWorkStationSecurityGroup": {
+    "ChefWorkstationSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "Enables ssh access to ChefWorkstation",
