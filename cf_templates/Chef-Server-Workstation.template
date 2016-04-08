@@ -365,13 +365,44 @@
               [
                 "#!/bin/bash -xe\n",
                 "apt-get update\n",
-                "echo new stuff goes here\n",
+                "apt-get -y install git unzip\n",
+                "cd /tmp\n",
+                "curl -LO https://packages.chef.io/stable/ubuntu/12.04/chefdk_0.12.0-1_amd64.deb\n",
+                "dpkg -i /tmp/chefdk_0.12.0-1_amd64.deb\n",
+                "mkdir -p /home/ubuntu/starter_kit\n",
+                "cd /home/ubuntu/starter_kit\n",
+                "git clone https://github.com/FastRobot/chef-starter-extractor\n",
+                "/opt/chefdk/embedded/bin/ruby chef-starter-extractor/getting_started.rb https://",
+                {
+                  "Fn::GetAtt": [
+                    "ChefServer",
+                    "PublicDnsName"
+                  ]
+                },
+                " ",
+                {
+                  "Ref": "OrgName"
+                },
+                " ",
+                {
+                  "Ref": "UserName"
+                },
+                " ",
+                {
+                  "Ref": "UserPassword"
+                },
+                "\n",
+                "cd /home/ubuntu\n",
+                "unzip /home/ubuntu/starter_kit/chef-starter.zip chef-repo/.chef/*\n",
+                "cd /home/ubuntu/chef-repo\n",
+                "knife ssl fetch\n",
+                "chown -R ubuntu:ubuntu /home/ubuntu\n",
                 "curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ChefWorkstation\", \"Data\" : \"Done\"}' \"",
                 {
                   "Ref": "WaitForChefWorkstationWaitHandle"
                 },
                 "\" \n",
-                "echo done dude\n"
+                "echo Dishes are done, man\n"
               ]
             ]
           }
