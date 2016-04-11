@@ -2,7 +2,7 @@
 # Cookbook Name:: workstation
 # Recipe:: default
 #
-# Copyright (c) 2016 The Authors, All Rights Reserved.
+# Copyright (c) 2016 Fast Robot, LLC, Apache 2.0
 
 # if we don't have the starter.zip AND .chef is not properly configured, let's get the starter.zip
 

@@ -2,7 +2,7 @@
 # Cookbook Name:: testcluster
 # Spec:: default
 #
-# Copyright (c) 2016 The Authors, All Rights Reserved.
+# Copyright (c) 2016 Fast Robot, LLC, Apache 2.0
 
 require 'spec_helper'
 

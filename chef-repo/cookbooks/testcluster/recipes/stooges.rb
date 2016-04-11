@@ -2,7 +2,7 @@
 # Cookbook Name:: testcluster
 # Recipe:: stooges.rb
 #
-# Copyright (c) 2016 The Authors, All Rights Reserved.
+# Copyright (c) 2016 Fast Robot, LLC, Apache 2.0
 
 require 'chef/provisioning/aws_driver'
 with_driver 'aws::us-west-1'

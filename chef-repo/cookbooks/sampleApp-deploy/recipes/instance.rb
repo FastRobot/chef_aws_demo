@@ -2,7 +2,7 @@
 # Cookbook Name:: sampleApp-deploy
 # Recipe:: instance
 #
-# Copyright (c) 2016 The Authors, All Rights Reserved.
+# Copyright (c) 2016 Fast Robot, LLC, Apache 2.0
 
 # performs some per-instance tagging/manipulation to leverage AWS specific features
 

@@ -2,7 +2,7 @@
 # Cookbook Name:: testcluster
 # Recipe:: nyuknyuknyuk
 #
-# Copyright (c) 2016 The Authors, All Rights Reserved.
+# Copyright (c) 2016 Fast Robot, LLC, Apache 2.0
 
 # This recipe tears down the world
 require 'chef/provisioning/aws_driver'

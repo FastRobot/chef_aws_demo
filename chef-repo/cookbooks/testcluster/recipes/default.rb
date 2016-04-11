@@ -2,7 +2,7 @@
 # Cookbook Name:: testcluster
 # Recipe:: default
 #
-# Copyright (c) 2016 The Authors, All Rights Reserved.
+# Copyright (c) 2016 Fast Robot, LLC, Apache 2.0
 
 #with_driver 'fog:AWS', :compute_options => { :aws_access_key_id => 'AKIAJIU3JBV5LQHEZTGA', :aws_secret_access_key => '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', :region => 'us-west-1' }
 #with_machine_options({

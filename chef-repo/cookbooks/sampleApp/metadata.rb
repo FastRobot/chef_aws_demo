@@ -6,4 +6,6 @@ description 'Installs/Configures sampleApp'
 long_description 'Installs/Configures sampleApp'
 version '0.1.0'
 
-depends 'poise'
+depends 'application_git'
+depends 'application_ruby'
+depends 'build-essential'
