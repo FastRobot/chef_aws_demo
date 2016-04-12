@@ -1,0 +1,5 @@
+source 'https://supermarket.chef.io'
+
+cookbook 'apt'
+cookbook 'sampleApp', path: 'sampleApp'
+
