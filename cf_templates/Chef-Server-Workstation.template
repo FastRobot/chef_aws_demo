@@ -15,7 +15,7 @@
       "Type": "AWS::EC2::VPC::Id"
     },
     "RemoteAdminCIDR": {
-      "Description": "CIDR Block or IP for SSH and RDP access",
+      "Description": "CIDR Block or IP for SSH access",
       "Type": "String",
       "Default": "0.0.0.0/0",
       "AllowedPattern": "[a-zA-Z0-9]+\\..+"
@@ -369,6 +369,8 @@
                 "cd /tmp\n",
                 "curl -LO https://packages.chef.io/stable/ubuntu/12.04/chefdk_0.12.0-1_amd64.deb\n",
                 "dpkg -i /tmp/chefdk_0.12.0-1_amd64.deb\n",
+                "mkdir -p /home/ubuntu/.berkshelf\n",
+                "echo '{ \"ssl\": { \"verify\": false } }' > /home/ubuntu/.berkshelf/config.json\n",
                 "mkdir -p /home/ubuntu/starter_kit\n",
                 "cd /home/ubuntu/starter_kit\n",
                 "git clone https://github.com/FastRobot/chef-starter-extractor\n",
