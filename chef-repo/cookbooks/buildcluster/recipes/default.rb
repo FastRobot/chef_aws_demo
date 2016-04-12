@@ -32,13 +32,13 @@ end
 
 aws_security_group 'aws-chef-web-sg' do
   vpc 'aws-chef-vpc'
-  inbound_rules '0.0.0.0/0' => [ 22, 80 ]
+  inbound_rules '0.0.0.0/0' => [ 22, 9000 ]
 end
 
 aws_security_group 'aws-chef-db-sg' do
   vpc 'aws-chef-vpc'
   inbound_rules '0.0.0.0/0' => [ 22 ],
-                'aws-chef-web-sg' => [ 6379 ]
+                '10.0.0.0/24' => [ 6379 ]
 end
 
 #
@@ -71,8 +71,8 @@ with_machine_options({
 
 #
 ## Build the front-end webservers
-num_web_instances = 3
-1.upto(num_web_instances) do |inst|
+
+1.upto(node['buildcluster']['num_web_instances']) do |inst|
     machine "web#{inst}" do
       recipe 'apt'
       recipe 'sampleApp::web'
@@ -80,7 +80,7 @@ num_web_instances = 3
 end
 
 load_balancer "aws-chef-elb" do
-  machines (1..num_web_instances).map { |inst| "web#{inst}" }
+  machines (1..node['buildcluster']['num_web_instances']).map { |inst| "web#{inst}" }
   load_balancer_options({
     :listeners => [{
       :port => 80,
@@ -93,9 +93,9 @@ load_balancer "aws-chef-elb" do
       unhealthy_threshold:  4,
       interval:             12,
       timeout:              5,
-      target:               "HTTP:9000/"
+      target:               'HTTP:9000/'
     },
-    subnets: "aws-chef-web-subnet",
-    security_groups: "aws-chef-web-sg"
+    subnets: 'aws-chef-web-subnet',
+    security_groups: 'aws-chef-web-sg'
   })
 end

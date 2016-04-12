@@ -14,9 +14,14 @@ with_chef_server node['buildcluster']['chef_server_url'],
   :signing_key_filename => node['buildcluster']['chef_signing_key_filename']
 
 # Delete the machines
-machine_batch do
+machine 'db1' do
   action :destroy
-  machines ['web1', 'web2', 'web3']
+end
+
+1.upto(node['buildcluster']['num_web_instances']) do |inst|
+    machine "web#{inst}" do
+      action :destroy
+    end
 end
 
 load_balancer 'aws-chef-elb' do
