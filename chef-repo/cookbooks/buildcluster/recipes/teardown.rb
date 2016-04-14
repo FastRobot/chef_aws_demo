@@ -20,7 +20,7 @@ end
 with_chef_server creds['chef_server_url'],
   :client_name => creds['node_name'],
   :signing_key_filename => creds['client_key']
-  
+
 # Delete the machines
 machine 'db1' do
   action :destroy
@@ -32,16 +32,16 @@ end
     end
 end
 
-load_balancer 'aws-chef-elb' do
+load_balancer 'chef-aws-elb' do
   action :destroy
 end
 
 # Purge the VPC to remove subnets and security groups
-aws_vpc 'aws-chef-vpc' do
+aws_vpc 'chef-aws-vpc' do
   action :purge
 end
 
 # Now delete the empty VPC
-aws_vpc 'aws-chef-vpc' do
+aws_vpc 'chef-aws-vpc' do
   action :destroy
 end

@@ -5,8 +5,12 @@
 # Copyright (c) 2016 The Authors, All Rights Reserved.
 
 require 'chef/provisioning/aws_driver'
+# Define your aws_region in the attributes file
 with_driver "aws::#{node['buildcluster']['aws_region']}"
 
+#
+## Get the knife credentials to use for chef-provisioning
+## and set our target chef_environment
 creds = getKnifeCreds 'Reading Knife Creds' do
   chef_dir node['buildcluster']['chef_dir']
 end
@@ -15,32 +19,34 @@ with_chef_server creds['chef_server_url'],
   :client_name => creds['node_name'],
   :signing_key_filename => creds['client_key']
 
-aws_vpc 'aws-chef-vpc' do
+with_chef_environment node['buildcluster']['chef_environment']
+
+aws_vpc 'chef-aws-vpc' do
   cidr_block '10.0.0.0/23'
   internet_gateway true
   main_routes '0.0.0.0/0' => :internet_gateway
   enable_dns_hostnames true
 end
 
-aws_subnet 'aws-chef-web-subnet' do
-  vpc 'aws-chef-vpc'
+aws_subnet 'chef-aws-web-subnet' do
+  vpc 'chef-aws-vpc'
   cidr_block '10.0.0.0/24'
   map_public_ip_on_launch true
 end
 
-aws_subnet 'aws-chef-db-subnet' do
-  vpc 'aws-chef-vpc'
+aws_subnet 'chef-aws-db-subnet' do
+  vpc 'chef-aws-vpc'
   cidr_block '10.0.1.0/24'
   map_public_ip_on_launch true
 end
 
-aws_security_group 'aws-chef-web-sg' do
-  vpc 'aws-chef-vpc'
+aws_security_group 'chef-aws-web-sg' do
+  vpc 'chef-aws-vpc'
   inbound_rules '0.0.0.0/0' => [ 22, 80 ]
 end
 
-aws_security_group 'aws-chef-db-sg' do
-  vpc 'aws-chef-vpc'
+aws_security_group 'chef-aws-db-sg' do
+  vpc 'chef-aws-vpc'
   inbound_rules '0.0.0.0/0' => [ 22 ],
                 '10.0.0.0/24' => [ 6379 ]
 end
@@ -51,8 +57,8 @@ machine 'db1' do
   machine_options bootstrap_options: {
     image_id: 'ami-df6a8b9b',
     instance_type: 't2.micro',
-    subnet: 'aws-chef-db-subnet',
-    security_group_ids: ['aws-chef-db-sg']
+    subnet: 'chef-aws-db-subnet',
+    security_group_ids: ['chef-aws-db-sg']
     },
     convergence_options: {
       chef_version: '12.8.1',
@@ -66,8 +72,8 @@ with_machine_options({
   bootstrap_options: {
     image_id: 'ami-06116566',
     instance_type: 't2.micro',
-    subnet: 'aws-chef-web-subnet',
-    security_group_ids: ['aws-chef-web-sg']
+    subnet: 'chef-aws-web-subnet',
+    security_group_ids: ['chef-aws-web-sg']
   },
   convergence_options: {
     chef_version: '12.8.1',
@@ -77,7 +83,6 @@ with_machine_options({
 
 #
 ## Build the front-end webservers
-
 1.upto(node['buildcluster']['num_web_instances']) do |inst|
     machine "web#{inst}" do
       recipe 'apt'
@@ -85,7 +90,9 @@ with_machine_options({
     end
 end
 
-load_balancer "aws-chef-elb" do
+#
+## Add the newly minted webservers into our load_balancer
+load_balancer "chef-aws-elb" do
   machines (1..node['buildcluster']['num_web_instances']).map { |inst| "web#{inst}" }
   load_balancer_options({
     :listeners => [{
@@ -101,7 +108,7 @@ load_balancer "aws-chef-elb" do
       timeout:              5,
       target:               'HTTP:80/'
     },
-    subnets: 'aws-chef-web-subnet',
-    security_groups: 'aws-chef-web-sg'
+    subnets: 'chef-aws-web-subnet',
+    security_groups: 'chef-aws-web-sg'
   })
 end
