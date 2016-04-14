@@ -1,5 +1,6 @@
 source 'https://supermarket.chef.io'
 
 cookbook 'apt'
+cookbook 'nginx', '2.7.6'
 cookbook 'sampleApp', path: 'sampleApp'
 
