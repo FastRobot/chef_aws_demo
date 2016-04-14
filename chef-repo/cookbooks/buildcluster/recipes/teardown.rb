@@ -9,10 +9,18 @@ require 'chef/provisioning/aws_driver'
 # Pick your aws region
 with_driver "aws::#{node['buildcluster']['aws_region']}"
 # Point to your Chef credentials...there is probably a better way to do this...
-with_chef_server node['buildcluster']['chef_server_url'],
-  :client_name => node['buildcluster']['chef_client_name'],
-  :signing_key_filename => node['buildcluster']['chef_signing_key_filename']
+# with_chef_server node['buildcluster']['chef_server_url'],
+#   :client_name => node['buildcluster']['chef_client_name'],
+#   :signing_key_filename => node['buildcluster']['chef_signing_key_filename']
 
+creds = getKnifeCreds 'Reading Knife Creds' do
+  chef_dir node['buildcluster']['chef_dir']
+end
+
+with_chef_server creds['chef_server_url'],
+  :client_name => creds['node_name'],
+  :signing_key_filename => creds['client_key']
+  
 # Delete the machines
 machine 'db1' do
   action :destroy

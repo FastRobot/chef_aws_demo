@@ -7,9 +7,13 @@
 require 'chef/provisioning/aws_driver'
 with_driver "aws::#{node['buildcluster']['aws_region']}"
 
-with_chef_server node['buildcluster']['chef_server_url'],
-  :client_name => node['buildcluster']['chef_client_name'],
-  :signing_key_filename => node['buildcluster']['chef_signing_key_filename']
+creds = getKnifeCreds 'Reading Knife Creds' do
+  chef_dir node['buildcluster']['chef_dir']
+end
+
+with_chef_server creds['chef_server_url'],
+  :client_name => creds['node_name'],
+  :signing_key_filename => creds['client_key']
 
 aws_vpc 'aws-chef-vpc' do
   cidr_block '10.0.0.0/23'
@@ -32,7 +36,7 @@ end
 
 aws_security_group 'aws-chef-web-sg' do
   vpc 'aws-chef-vpc'
-  inbound_rules '0.0.0.0/0' => [ 22, 9000 ]
+  inbound_rules '0.0.0.0/0' => [ 22, 80 ]
 end
 
 aws_security_group 'aws-chef-db-sg' do
@@ -51,6 +55,7 @@ machine 'db1' do
     security_group_ids: ['aws-chef-db-sg']
     },
     convergence_options: {
+      chef_version: '12.8.1',
       ssl_verify_mode: :verify_none
     }
   recipe 'apt'
@@ -65,6 +70,7 @@ with_machine_options({
     security_group_ids: ['aws-chef-web-sg']
   },
   convergence_options: {
+    chef_version: '12.8.1',
     ssl_verify_mode: :verify_none
   }
 })
@@ -85,7 +91,7 @@ load_balancer "aws-chef-elb" do
     :listeners => [{
       :port => 80,
       :protocol => :http,
-      :instance_port => 9000,
+      :instance_port => 80,
       :instance_protocol => :http,
     }],
     health_check: {
@@ -93,7 +99,7 @@ load_balancer "aws-chef-elb" do
       unhealthy_threshold:  4,
       interval:             12,
       timeout:              5,
-      target:               'HTTP:9000/'
+      target:               'HTTP:80/'
     },
     subnets: 'aws-chef-web-subnet',
     security_groups: 'aws-chef-web-sg'
