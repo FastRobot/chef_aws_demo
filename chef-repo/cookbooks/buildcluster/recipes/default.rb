@@ -55,13 +55,13 @@ end
 ## Build the database box first
 machine 'db1' do
   machine_options bootstrap_options: {
-    image_id: 'ami-df6a8b9b',
-    instance_type: 't2.micro',
+    image_id: node['buildcluster']['image_id'],
+    instance_type: node['buildcluster']['instance_type'],
     subnet: 'chef-aws-db-subnet',
     security_group_ids: ['chef-aws-db-sg']
     },
     convergence_options: {
-      chef_version: '12.8.1',
+      chef_version: node['buildcluster']['chef_client_version'],
       ssl_verify_mode: :verify_none
     }
   recipe 'apt'
@@ -70,13 +70,13 @@ end
 
 with_machine_options({
   bootstrap_options: {
-    image_id: 'ami-06116566',
-    instance_type: 't2.micro',
+    image_id: node['buildcluster']['image_id'],
+    instance_type: node['buildcluster']['instance_type'],
     subnet: 'chef-aws-web-subnet',
     security_group_ids: ['chef-aws-web-sg']
   },
   convergence_options: {
-    chef_version: '12.8.1',
+    chef_version: node['buildcluster']['chef_client_version'],
     ssl_verify_mode: :verify_none
   }
 })
