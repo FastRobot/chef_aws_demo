@@ -322,6 +322,9 @@
       "Condition": "WorkstationInstance",
       "DependsOn": "WaitForChefServerInstall",
       "Properties": {
+        "IamInstanceProfile": {
+          "Ref": "RootInstanceProfile"
+        },
         "ImageId": {
           "Fn::FindInMap": [
             "Ubuntu1404AMI",
@@ -365,7 +368,7 @@
               [
                 "#!/bin/bash -xe\n",
                 "apt-get update\n",
-                "apt-get -y install git unzip\n",
+                "apt-get -y install git unzip awscli jq\n",
                 "cd /tmp\n",
                 "curl -LO https://packages.chef.io/stable/ubuntu/12.04/chefdk_0.12.0-1_amd64.deb\n",
                 "dpkg -i /tmp/chefdk_0.12.0-1_amd64.deb\n",
@@ -398,6 +401,21 @@
                 "unzip /home/ubuntu/starter_kit/chef-starter.zip chef-repo/.chef/*\n",
                 "cd /home/ubuntu/chef-repo\n",
                 "knife ssl fetch\n",
+                "echo 'export AWS_DEFAULT_REGION=",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "' >> /home/ubuntu/.bash_profile\n",
+                "echo 'export AWS_SSH_KEY_ID=",
+                {
+                  "Ref": "KeyPairName"
+                },
+                "' >> /home/ubuntu/.bash_profile\n",
+                "echo 'export SECURITY_GROUP_IDS=",
+                {
+                  "Ref": "ChefWorkstationSecurityGroup"
+                },
+                "' >> /home/ubuntu/.bash_profile\n",
                 "chown -R ubuntu:ubuntu /home/ubuntu\n",
                 "curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ChefWorkstation\", \"Data\" : \"Done\"}' \"",
                 {
@@ -454,17 +472,65 @@
           }
         ]
       }
+    },
+    "RootRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "root",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "*",
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "RootInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "RootRole"
+          }
+        ]
+      }
     }
   },
-"Outputs": {
-"ChefServerDnsName": {
-"Value": {
-"Fn::GetAtt": [
-"ChefServer",
-"PublicDnsName"
-]
-},
-"Description": "Public DNS Name for the Chef Server, hit via https"
-}
-}
+  "Outputs": {
+    "ChefServerDnsName": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ChefServer",
+          "PublicDnsName"
+        ]
+      },
+      "Description": "Public DNS Name for the Chef Server, hit via https"
+    }
+  }
 }
