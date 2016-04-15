@@ -407,7 +407,7 @@
                 {
                   "Ref": "AWS::Region"
                 },
-                ' >> /home/ubuntu/.aws/config\n",
+                "' >> /home/ubuntu/.aws/config\n",
                 "echo 'output=json' >> /home/ubuntu/.aws/config\n",
                 "echo 'export AWS_DEFAULT_REGION=",
                 {
