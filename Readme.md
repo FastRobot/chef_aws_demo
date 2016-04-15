@@ -22,6 +22,10 @@ with an ELB for redundancy.
 Go to the AWS cloudformation console in any region and build a stack from the 
 included Chef-Server-Workstation.template.
 
+Fill out all the parameters.
+
+On the final launch page, don't forget to OK the creation of IAM roles via the checkbox at the bottom.
+
 Find the public hostname or IP of the ChefWorkstation machine and ssh into it as user ubuntu, 
 using the key you specified when you created the above stack
 
@@ -35,9 +39,15 @@ ubuntu@ip-172-31-2-174:~/chef-repo$ knife client list
 myorg-validator  
 ```
 
+# Behind the scenes
+
+The cloudformation accomplishes the following
+1. Starts the proper Chef Server AMI from the Marketplace based on your license number and region
+2. Uses the parameters you supplied to create a user and organization on the chef server
+3. Waits till that chef server finishes the upgrade and installation (takes about 25 minutes)
+4. Creates a workstation box 
+
 TODO
-get buildcluster working on workstation with creds
-iterate over IAM roles in console till awscli works without creds
 rename buildcluster to sampleAppDeploy and put in public repo
 
 

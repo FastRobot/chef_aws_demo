@@ -33,7 +33,7 @@
       "Description": "Chef Organization to create",
       "Type": "String",
       "Default": "sampleorg",
-      "AllowedPattern": "[a-zA-Z0-9]+"
+      "AllowedPattern": "[a-z0-9]+"
     },
     "FirstName": {
       "Description": "Admin's First Name",
