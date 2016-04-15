@@ -409,6 +409,7 @@
                 },
                 "' >> /home/ubuntu/.aws/config\n",
                 "echo 'output=json' >> /home/ubuntu/.aws/config\n",
+                "echo 'export KITCHEN_DRIVER=EC2' >> /home/ubuntu/.bash_profile\n",
                 "echo 'export AWS_DEFAULT_REGION=",
                 {
                   "Ref": "AWS::Region"
