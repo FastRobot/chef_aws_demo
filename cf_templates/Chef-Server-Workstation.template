@@ -401,6 +401,15 @@
                 "unzip /home/ubuntu/starter_kit/chef-starter.zip chef-repo/.chef/*\n",
                 "cd /home/ubuntu/chef-repo\n",
                 "knife ssl fetch\n",
+                "mkdir -p /home/ubuntu/.aws\n",
+                "echo '[default]' > /home/ubuntu/.aws/config\n",
+                "echo 'region=",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "' >> /home/ubuntu/.aws/config\n",
+                "echo 'output=json' >> /home/ubuntu/.aws/config\n",
+                "echo 'export KITCHEN_DRIVER=EC2' >> /home/ubuntu/.bash_profile\n",
                 "echo 'export AWS_DEFAULT_REGION=",
                 {
                   "Ref": "AWS::Region"

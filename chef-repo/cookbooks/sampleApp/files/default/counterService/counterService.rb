@@ -10,5 +10,5 @@ $Redis = Redis.new(host: settings.redis_host, port: 6379)
 
 get '/' do
   count = $Redis.incr( "request_count" )
-  "This is request #{count}\n"
+  erb :index, :locals => {:count => count}
 end
