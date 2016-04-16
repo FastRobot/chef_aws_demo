@@ -13,6 +13,9 @@ driver:
   security_group_ids: [<%= ENV['SECURITY_GROUP_IDS'] %>]
   <% end %>
   <% if kitchen_driver == 'vagrant' %>
+  network:
+  - ["forwarded_port", {guest: 80, host: 8080}]
+  - ["forwarded_port", {guest: 9000, host: 9090}]
   customize:
     memory: 2048
   <% end %>
@@ -27,8 +30,9 @@ platforms:
     tags: { "Name": "Test Kitchen" }
   <% end %>
 
-verifier:
-  name: inspec
+# inspec does not yet use the ssh-agent, so getting this to work via ec2 is problematic
+#verifier:
+#  name: inspec
 
 suites:
   - name: default
