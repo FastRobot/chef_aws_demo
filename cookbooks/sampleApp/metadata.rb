@@ -6,7 +6,7 @@ description 'Installs/Configures sampleApp'
 long_description 'Installs/Configures sampleApp'
 version '0.1.1'
 
-depends 'nginx'
+depends 'nginx', '~> 2.7.6'
 depends 'application_git'
 depends 'application_ruby'
 depends 'build-essential'
