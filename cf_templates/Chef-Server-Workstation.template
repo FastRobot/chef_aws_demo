@@ -131,12 +131,12 @@
         "250": "ami-7eb5b410"
       },
       "us-east-1": {
-        "25": "ami-8e88b9e4",
-        "50": "ami-f686b79c",
-        "100": "ami-8589b8ef",
-        "150": "ami-7a89b810",
-        "200": "ami-788bba12",
-        "250": "ami-ec8bba86"
+        "25": "ami-30393d5a",
+        "50": "ami-30393d5a",
+        "100": "ami-30393d5a",
+        "150": "ami-30393d5a",
+        "200": "ami-30393d5a",
+        "250": "ami-30393d5a"
       },
       "sa-east-1": {
         "25": "ami-002caf6c",
@@ -155,12 +155,12 @@
         "250": "ami-6d8ffe0d"
       },
       "us-west-2": {
-        "25": "ami-087e9d68",
-        "50": "ami-587d9e38",
-        "100": "ami-387c9f58",
-        "150": "ami-4a43a02a",
-        "200": "ami-197d9e79",
-        "250": "ami-cc42a1ac"
+        "25": "ami-95ba54f5",
+        "50": "ami-95ba54f5",
+        "100": "ami-95ba54f5",
+        "150": "ami-95ba54f5",
+        "200": "ami-95ba54f5",
+        "250": "ami-95ba54f5"
       }
     },
     "Ubuntu1404AMI": {
@@ -220,6 +220,7 @@
     },
     "WaitForChefWorkstationInstall": {
       "Type": "AWS::CloudFormation::WaitCondition",
+      "Condition": "WorkstationInstance",
       "DependsOn": "ChefWorkstation",
       "Properties": {
         "Handle": {
@@ -395,6 +396,10 @@
                 " ",
                 {
                   "Ref": "UserPassword"
+                },
+                " ",
+                {
+                  "Ref": "ChefServer"
                 },
                 "\n",
                 "cd /home/ubuntu\n",
