@@ -1,7 +1,0 @@
-name 'testcluster'
-maintainer 'The Authors'
-maintainer_email 'you@example.com'
-license 'all_rights'
-description 'Installs/Configures testcluster'
-long_description 'Installs/Configures testcluster'
-version '0.1.0'
