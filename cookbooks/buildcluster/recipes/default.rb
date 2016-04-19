@@ -21,7 +21,7 @@ with_chef_server creds['chef_server_url'],
 
 with_chef_environment node['buildcluster']['chef_environment']
 
-aws_vpc 'chef-aws-vpc' do
+my_vpc = aws_vpc 'chef-aws-vpc' do
   cidr_block '10.0.0.0/23'
   internet_gateway true
   main_routes '0.0.0.0/0' => :internet_gateway
@@ -40,13 +40,13 @@ aws_subnet 'chef-aws-db-subnet' do
   map_public_ip_on_launch true
 end
 
-aws_security_group 'chef-aws-web-sg' do
-  vpc 'chef-aws-vpc'
+web_sg = aws_security_group 'chef-aws-web-sg' do
+  vpc lazy { my_vpc.aws_object.id }
   inbound_rules '0.0.0.0/0' => [ 22, 80 ]
 end
 
-aws_security_group 'chef-aws-db-sg' do
-  vpc 'chef-aws-vpc'
+db_sg = aws_security_group 'chef-aws-db-sg' do
+  vpc lazy { my_vpc.aws_object.id }
   inbound_rules '0.0.0.0/0' => [ 22 ],
                 '10.0.0.0/24' => [ 6379 ]
 end
@@ -58,7 +58,7 @@ machine 'db1' do
     image_id: node['buildcluster']['image_id'],
     instance_type: node['buildcluster']['instance_type'],
     subnet: 'chef-aws-db-subnet',
-    security_group_ids: ['chef-aws-db-sg']
+    security_group_ids: lazy { [db_sg.aws_object.id] }
     },
     convergence_options: {
       chef_version: node['buildcluster']['chef_client_version'],
