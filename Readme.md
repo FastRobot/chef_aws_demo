@@ -102,12 +102,15 @@ ubuntu@ip-172-31-2-78:~/chef-repo$ chef-client --local-mode -r buildcluster
 # Behind the scenes
 
 The cloudformation accomplishes the following
+
 1. Starts the proper Chef Server AMI from the Marketplace based on your region. If you're in one of the
 two regions that support the FlexPricing AMI, it chooses that AMI, otherwise it picks one based on the 
 number of nodes you selected.
 2. Uses the parameters you supplied to create a user and organization on the chef server
 3. Waits till that chef server finishes the upgrade and installation (takes about 25 minutes)
-4. Creates a workstation box, 
+4. Creates a workstation box, assigns it very permissive IAM roles and policies
+5. The Workstation downloads the knife credentials from your chef server and clones some cookbooks down
+6. All done, login to the workstation as user ubuntu and cd to the chef-repo directory.
 
 TODO
 rename buildcluster to sampleAppDeploy and put in public repo
