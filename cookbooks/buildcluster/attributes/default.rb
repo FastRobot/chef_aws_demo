@@ -6,7 +6,7 @@ default['buildcluster']['aws_region'] = 'us-west-1'
 # PATH to your .chef directory from the chef-starter.zip
 default['buildcluster']['chef_dir'] = '/home/ubuntu/chef-repo/.chef'
 # The chef_environment to deploy our nodes into in
-default['buildcluster']['chef_environment'] = 'chef_aws_demo'
+default['buildcluster']['chef_environment'] = '_default'
 
 #
 ## machine details
