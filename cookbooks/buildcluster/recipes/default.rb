@@ -2,7 +2,7 @@
 # Cookbook Name:: buildcluster
 # Recipe:: default
 #
-# Copyright (c) 2016 The Authors, All Rights Reserved.
+# Copyright (c) 2016 Fast Robot, LLC, Apache 2.0
 
 require 'chef/provisioning/aws_driver'
 # Define your aws_region in the attributes file
@@ -68,18 +68,6 @@ machine 'db1' do
   recipe 'sampleApp::db'
 end
 
-with_machine_options({
-  bootstrap_options: {
-    image_id: node['buildcluster']['image_id'],
-    instance_type: node['buildcluster']['instance_type'],
-    subnet: 'chef-aws-web-subnet',
-    security_group_ids: ['chef-aws-web-sg']
-  },
-  convergence_options: {
-    chef_version: node['buildcluster']['chef_client_version'],
-    ssl_verify_mode: :verify_none
-  }
-})
 
 #
 ## Build the front-end webservers
@@ -87,6 +75,18 @@ with_machine_options({
     machine "web#{inst}" do
       recipe 'apt'
       recipe 'sampleApp::web'
+      machine_options({
+        bootstrap_options: {
+            image_id: node['buildcluster']['image_id'],
+            instance_type: node['buildcluster']['instance_type'],
+            subnet: 'chef-aws-web-subnet',
+            security_group_ids: lazy { [web_sg.aws_object.id] }
+        },
+        convergence_options: {
+            chef_version: node['buildcluster']['chef_client_version'],
+            ssl_verify_mode: :verify_none
+        }
+    })
     end
 end
 
@@ -110,5 +110,6 @@ load_balancer "chef-aws-elb" do
     },
     subnets: 'chef-aws-web-subnet',
     security_groups: 'chef-aws-web-sg'
+
   })
 end
