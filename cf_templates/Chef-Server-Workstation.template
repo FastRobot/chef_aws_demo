@@ -50,17 +50,14 @@
       "Type": "String",
       "Default": "admin@localhost.internal"
     },
-    "ChefNodes": {
-      "Description": "Select the number of nodes you want to support.",
+    "ChefServerRegion": {
+      "Description": "Which region to run the Chef Server from",
       "AllowedValues": [
-        "25",
-        "100",
-        "150",
-        "200",
-        "250"
+        "us-west-2",
+        "us-east-1"
       ],
       "Type": "String",
-      "Default": "25"
+      "Default": "us-west-2"
     },
     "IncludeWorkstation": {
       "Description": "A value of 'true' includes a Chef workstation. For Chef Server only, set to 'false'",
@@ -70,12 +67,6 @@
       ],
       "Type": "String",
       "Default": "true"
-    },
-    "VPCCIDR": {
-      "Description": "CIDR Block for the VPC",
-      "Type": "String",
-      "Default": "10.0.0.0/16",
-      "AllowedPattern": "[a-zA-Z0-9]+\\..+"
     }
   },
   "Conditions": {
@@ -90,77 +81,11 @@
   },
   "Mappings": {
     "ChefAMI": {
-      "eu-west-1": {
-        "25": "ami-a23228ce",
-        "50": "ami-f032289c",
-        "100": "ami-6ebd001d",
-        "150": "ami-beb904cd",
-        "200": "ami-0ebe037d",
-        "250": "ami-e7bc0194"
-      },
-      "ap-southeast-1": {
-        "25": "ami-3acc0559",
-        "50": "ami-adcd04ce",
-        "100": "ami-cdcc05ae",
-        "150": "ami-1fcf067c",
-        "200": "ami-c8ce07ab",
-        "250": "ami-cbcf06a8"
-      },
-      "ap-southeast-2": {
-        "25": "ami-a67a5cc5",
-        "50": "ami-997a5cfa",
-        "100": "ami-b17d5bd2",
-        "150": "ami-c37c5aa0",
-        "200": "ami-be7d5bdd",
-        "250": "ami-c77c5aa4"
-      },
-      "eu-central-1": {
-        "25": "ami-a23228ce",
-        "50": "ami-f032289c",
-        "100": "ami-503d273c",
-        "150": "ami-a93329c5",
-        "200": "ami-0d332961",
-        "250": "ami-7b3d2717"
-      },
-      "ap-northeast-1": {
-        "25": "ami-5db0b133",
-        "50": "ami-e3b1b08d",
-        "100": "ami-712be51f",
-        "150": "ami-1bb2b375",
-        "200": "ami-4cb7b622",
-        "250": "ami-7eb5b410"
-      },
       "us-east-1": {
-        "25": "ami-30393d5a",
-        "50": "ami-30393d5a",
-        "100": "ami-30393d5a",
-        "150": "ami-30393d5a",
-        "200": "ami-30393d5a",
-        "250": "ami-30393d5a"
-      },
-      "sa-east-1": {
-        "25": "ami-002caf6c",
-        "50": "ami-1033b07c",
-        "100": "ami-1233b07e",
-        "150": "ami-1a37b476",
-        "200": "ami-8532b1e9",
-        "250": "ami-0432b168"
-      },
-      "us-west-1": {
-        "25": "ami-4d8dfc2d",
-        "50": "ami-f48eff94",
-        "100": "ami-7f8ffe1f",
-        "150": "ami-4f8dfc2f",
-        "200": "ami-7b8eff1b",
-        "250": "ami-6d8ffe0d"
+        "flex": "ami-30393d5a"
       },
       "us-west-2": {
-        "25": "ami-95ba54f5",
-        "50": "ami-95ba54f5",
-        "100": "ami-95ba54f5",
-        "150": "ami-95ba54f5",
-        "200": "ami-95ba54f5",
-        "250": "ami-95ba54f5"
+        "flex": "ami-95ba54f5"
       }
     },
     "Ubuntu1404AMI": {
@@ -241,11 +166,9 @@
           "Fn::FindInMap": [
             "ChefAMI",
             {
-              "Ref": "AWS::Region"
+              "Ref": "ChefServerRegion"
             },
-            {
-              "Ref": "ChefNodes"
-            }
+            "flex"
           ]
         },
         "InstanceType": "t2.medium",
@@ -403,6 +326,7 @@
                 },
                 "\n",
                 "cd /home/ubuntu\n",
+                "git clone https://github.com/FastRobot/chef_aws_demo.git chef-repo\n",
                 "unzip /home/ubuntu/starter_kit/chef-starter.zip chef-repo/.chef/*\n",
                 "cd /home/ubuntu/chef-repo\n",
                 "knife ssl fetch\n",
