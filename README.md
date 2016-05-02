@@ -13,7 +13,7 @@ needing to perform any additional configuration.
 From there you may explore a sample web application backed by a redis datastore, and test changes locally 
 using test kitchen. 
 
-Once you happy with your tested changes, you can use a different cookbook to automatically deploy that
+Once you are happy with your tested changes, you can use a different cookbook to automatically deploy that
 app to EC2 instances that chef will provision for you, put into different secure subnets and register 
 with an ELB for redundancy.
  
