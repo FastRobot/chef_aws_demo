@@ -469,6 +469,16 @@
         ]
       },
       "Description": "Public DNS Name for the Chef Server, hit via https"
+    },
+    "ChefWorkstationDnsName": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ChefWorkstation",
+          "PublicDnsName"
+        ]
+      },
+      "Description": "Public DNS Name for the Chef Workstation, login as user ubuntu",
+      "Condition" : "WorkstationInstance"
     }
   }
 }
