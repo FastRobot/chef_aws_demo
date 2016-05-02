@@ -104,8 +104,8 @@ load_balancer "chef-aws-elb" do
     health_check: {
       healthy_threshold:    2,
       unhealthy_threshold:  4,
-      interval:             12,
-      timeout:              5,
+      interval:             5,
+      timeout:              2,
       target:               'HTTP:80/'
     },
     subnets: 'chef-aws-web-subnet',
