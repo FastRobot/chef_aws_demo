@@ -204,31 +204,40 @@
               "",
               [
                 "#!/bin/bash\n",
-                "chef-marketplace-ctl setup --yes --eula --register -u ",
+                "chef-server-ctl user-create ",
                 {
                   "Ref": "UserName"
                 },
-                "  -f ",
+                " ",
                 {
                   "Ref": "FirstName"
                 },
-                " -l ",
+                " ",
                 {
                   "Ref": "LastName"
                 },
-                " -e ",
+                " ",
                 {
                   "Ref": "AdminEmailAddress"
+                },
+                " ",
+                {
+                  "Ref": "UserPassword"
                 },
                 " -o ",
                 {
                   "Ref": "OrgName"
                 },
-                " -p ",
+                " > /home/ec2-user/user.pem\n",
+                "chef-server-ctl org-create ",
                 {
-                  "Ref": "UserPassword"
+                  "Ref": "OrgName"
                 },
-                "\n",
+                " Chef Demo Org -a ",
+                {
+                  "Ref": "UserName"
+                },
+                " > /home/ec2-user/validator.pem\n",
                 "curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ChefServer\", \"Data\" : \"Done\"}' \"",
                 {
                   "Ref": "WaitForChefServerWaitHandle"
@@ -469,6 +478,16 @@
         ]
       },
       "Description": "Public DNS Name for the Chef Server, hit via https"
+    },
+    "ChefWorkstationDnsName": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ChefWorkstation",
+          "PublicDnsName"
+        ]
+      },
+      "Description": "Public DNS Name for the Chef Workstation, login as user ubuntu",
+      "Condition" : "WorkstationInstance"
     }
   }
 }
