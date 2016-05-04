@@ -17,22 +17,43 @@ with_chef_server creds['chef_server_url'],
   :client_name => creds['node_name'],
   :signing_key_filename => creds['client_key']
 
-# Delete the machines
-machine 'db1' do
-  action :destroy
+# Batch delete the machines
+machine_batch 'Terminate all of the machines!!!' do
+  machine 'db1' do
+    action :destroy
+  end
+
+  1.upto(node['buildcluster']['num_web_instances']) do |inst|
+      machine "web#{inst}" do
+        action :destroy
+      end
+  end
 end
 
-1.upto(node['buildcluster']['num_web_instances']) do |inst|
-    machine "web#{inst}" do
-      action :destroy
-    end
-end
-
+# Delete the ELB now that machines are gone
 load_balancer 'chef-aws-elb' do
   action :destroy
 end
 
-# Purge the VPC to remove subnets and security groups
+# Delete the subnets
+aws_subnet 'chef-aws-web-subnet' do
+  action :delete
+end
+
+aws_subnet 'chef-aws-db-subnet' do
+  action :delete
+end
+
+# Delete the Security groups
+aws_security_group 'chef-aws-web-sg' do
+  action :delete
+end
+
+aws_security_group 'chef-aws-db-sg' do
+  action :delete
+end
+
+# Purge the VPC to remove anything we missed
 aws_vpc 'chef-aws-vpc' do
   action :purge
 end
