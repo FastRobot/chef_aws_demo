@@ -10,11 +10,11 @@ The workstation is automatically linked to the chef server, pulls down some samp
 and uploads cookbooks to your server. You can login to the workstation and run knife commands without 
 needing to perform any additional configuration.
 
-From there you may explore a sample web application backed by a redis datastore, and test changes locally 
-using test kitchen. 
+From there you may explore a sample web application backed by a redis datastore, and test changes locally
+ (using vagrant or EC2) using test kitchen. 
 
-Once you are happy with your tested changes, you can use a different cookbook to automatically deploy that
-app to EC2 instances that chef will provision for you, put into different secure subnets and register 
+Once you are happy with your tested changes, you can use a different cookbook to automatically deploy the
+sampleApp to EC2 instances that chef will provision for you, put into different secure subnets and register 
 with an ELB for redundancy.
  
 ## Usage 
@@ -27,7 +27,9 @@ Fill out all the parameters.
 On the final launch page, don't forget to OK the creation of IAM roles via the checkbox at the bottom.
 
 Find the public hostname or IP of the ChefWorkstation machine and ssh into it as user ubuntu, 
-using the key you specified when you created the above stack
+using the key you specified when you created the above stack. If you'd like buildcluster or test kitchen to work,
+you'll need to make sure you're using ssh-agent to serve up your ssh keys and ssh to the workstation instance
+with -A to allow further ssh connections access to your agent. 
 
 ```
 $ ssh -A ubuntu@ec2-52-38-105-203.us-west-2.compute.amazonaws.com  
@@ -88,6 +90,8 @@ ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$ kitchen test
 ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$
 ```
 
+
+
 You could have also cloned the repo to your local computer and run the same kitchen test, which would have noted 
 the lack of AWS/EC2 environment variables and used the vagrant driver instead.
 
@@ -97,6 +101,17 @@ Finally, happy with the above deployment and tests, go ahead and run
 ubuntu@ip-172-31-2-78:~/chef-repo$ chef-client --local-mode -r buildcluster
 ```
 
+When you are finished with these examples, don't forget to clean up after yourself to prevent unnecessary
+charges.
+
+```
+ubuntu@ip-172-31-2-78:~/chef-repo$ chef-client --local-mode -r "buildcluster::teardown"
+```
+Note that the teardown will attempt to destroy all the machines you built via the buildcluster and destroy
+the created vpc (named 'chef-aws-vpc') and purge all remaining subnet and network objects in it. Not only will this
+kill you, it will hurt the entire time you are dying.
+
+You s
 
 
 # Behind the scenes
