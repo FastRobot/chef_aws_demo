@@ -28,14 +28,14 @@ my_vpc = aws_vpc 'chef-aws-vpc' do
   enable_dns_hostnames true
 end
 
-aws_subnet 'chef-aws-web-subnet' do
-  vpc 'chef-aws-vpc'
+web_subnet = aws_subnet 'chef-aws-web-subnet' do
+  vpc  lazy { my_vpc.aws_object.id }
   cidr_block '10.0.0.0/24'
   map_public_ip_on_launch true
 end
 
 aws_subnet 'chef-aws-db-subnet' do
-  vpc 'chef-aws-vpc'
+  vpc  lazy { my_vpc.aws_object.id }
   cidr_block '10.0.1.0/24'
   map_public_ip_on_launch true
 end
@@ -110,8 +110,8 @@ load_balancer "chef-aws-elb" do
       timeout:              2,
       target:               'HTTP:80/'
     },
-    subnets: 'chef-aws-web-subnet',
-    security_groups: 'chef-aws-web-sg'
+    subnets: lazy { [web_subnet.aws_object.id] },
+    security_groups: lazy { [web_sg.aws_object.id] }
 
   })
 end

@@ -69,6 +69,18 @@
       "Default": "true"
     }
   },
+  "Metadata": {
+  "AWS::CloudFormation::Interface" : {
+    "ParameterGroups" : [{
+      "Label" : {"default": "Chef Configuration"},
+      "Parameters" : ["OrgName", "UserName", "UserPassword", "FirstName",
+        "LastName", "AdminEmailAddress", "ChefServerRegion", "IncludeWorkstation"]
+    },{
+      "Label" : {"default": "Network Configuration"},
+      "Parameters" : ["KeyPairName", "SubnetId", "VPC", "RemoteAdminCIDR"]
+    }]
+  }
+},
   "Conditions": {
     "WorkstationInstance": {
       "Fn::Equals": [
@@ -418,6 +430,16 @@
             }
           }
         ]
+      }
+    },
+    "TestKitchenIngress": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": { "Ref": "ChefWorkstationSecurityGroup" },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "SourceSecurityGroupId": { "Ref": "ChefWorkstationSecurityGroup" }
       }
     },
     "RootRole": {

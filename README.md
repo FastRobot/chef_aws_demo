@@ -95,10 +95,32 @@ ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$
 You could have also cloned the repo to your local computer and run the same kitchen test, which would have noted 
 the lack of AWS/EC2 environment variables and used the vagrant driver instead.
 
-Finally, happy with the above deployment and tests, go ahead and run 
+Next, happy with the above deployment and tests, install (stage) the cookbooks to your workstation
+and upload the cookbooks to the chef server with these two berks commands from inside the sampleApp:
+```
+ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$ berks install
+Resolving cookbook dependencies...
+Fetching 'sampleApp' from source at .
+Using 7-zip (1.0.2)
+...
+ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$ berks upload
+Uploaded 7-zip (1.0.2) to: 'https://ec2-52-39-174-145.us-west-2.compute.amazonaws.com:443/organizations/myorg'
+...
+```
+
+Then go ahead and run a local chef-client with the buildcluster cookbook: 
 
 ```
 ubuntu@ip-172-31-2-78:~/chef-repo$ chef-client --local-mode -r buildcluster
+```
+
+To view your new cluster, you'd need to wait 2 minutes until the instances pass their health checks then
+go to the ELB url. Don't know the ELB url? Good news, we installed the aws cli toolkit and preconfigured
+it to have access to your account:
+
+```
+ubuntu@ip-172-31-4-121:~/chef-repo$ aws elb describe-load-balancers --query LoadBalancerDescriptions[0].CanonicalHostedZoneName
+"chef-aws-elb-752615793.us-west-2.elb.amazonaws.com"
 ```
 
 When you are finished with these examples, don't forget to clean up after yourself to prevent unnecessary
@@ -111,7 +133,6 @@ Note that the teardown will attempt to destroy all the machines you built via th
 the created vpc (named 'chef-aws-vpc') and purge all remaining subnet and network objects in it. Not only will this
 kill you, it will hurt the entire time you are dying.
 
-You s
 
 
 # Behind the scenes
