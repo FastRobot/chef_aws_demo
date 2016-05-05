@@ -69,6 +69,18 @@
       "Default": "true"
     }
   },
+  "Metadata": {
+  "AWS::CloudFormation::Interface" : {
+    "ParameterGroups" : [{
+      "Label" : {"default": "Chef Configuration"},
+      "Parameters" : ["OrgName", "UserName", "UserPassword", "FirstName",
+        "LastName", "AdminEmailAddress", "ChefServerRegion", "IncludeWorkstation"]
+    },{
+      "Label" : {"default": "Network Configuration"},
+      "Parameters" : ["KeyPairName", "SubnetId", "VPC", "RemoteAdminCIDR"]
+    }]
+  }
+},
   "Conditions": {
     "WorkstationInstance": {
       "Fn::Equals": [
