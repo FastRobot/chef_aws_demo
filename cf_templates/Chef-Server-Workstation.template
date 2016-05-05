@@ -432,6 +432,16 @@
         ]
       }
     },
+    "TestKitchenIngress": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": { "Ref": "ChefWorkstationSecurityGroup" },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "SourceSecurityGroupId": { "Ref": "ChefWorkstationSecurityGroup" }
+      }
+    },
     "RootRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {

@@ -95,7 +95,20 @@ ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$
 You could have also cloned the repo to your local computer and run the same kitchen test, which would have noted 
 the lack of AWS/EC2 environment variables and used the vagrant driver instead.
 
-Finally, happy with the above deployment and tests, go ahead and run 
+Next, happy with the above deployment and tests, install (stage) the cookbooks to your workstation
+and upload the cookbooks to the chef server with these two berks commands from inside the sampleApp:
+```
+ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$ berks install
+Resolving cookbook dependencies...
+Fetching 'sampleApp' from source at .
+Using 7-zip (1.0.2)
+...
+ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$ berks upload
+Uploaded 7-zip (1.0.2) to: 'https://ec2-52-39-174-145.us-west-2.compute.amazonaws.com:443/organizations/myorg'
+...
+```
+
+Then go ahead and run a local chef-client with the buildcluster cookbook: 
 
 ```
 ubuntu@ip-172-31-2-78:~/chef-repo$ chef-client --local-mode -r buildcluster
