@@ -71,23 +71,25 @@ end
 
 #
 ## Build the front-end webservers
-1.upto(node['buildcluster']['num_web_instances']) do |inst|
-    machine "web#{inst}" do
-      recipe 'apt'
-      recipe 'sampleApp::web'
-      machine_options({
-        bootstrap_options: {
-            image_id: node['buildcluster']['image_id'],
-            instance_type: node['buildcluster']['instance_type'],
-            subnet: 'chef-aws-web-subnet',
-            security_group_ids: lazy { [web_sg.aws_object.id] }
-        },
-        convergence_options: {
-            chef_version: node['buildcluster']['chef_client_version'],
-            ssl_verify_mode: :verify_none
-        }
-    })
-    end
+machine_batch 'Build Webservers' do
+  1.upto(node['buildcluster']['num_web_instances']) do |inst|
+      machine "web#{inst}" do
+        recipe 'apt'
+        recipe 'sampleApp::web'
+        machine_options({
+          bootstrap_options: {
+              image_id: node['buildcluster']['image_id'],
+              instance_type: node['buildcluster']['instance_type'],
+              subnet: 'chef-aws-web-subnet',
+              security_group_ids: lazy { [web_sg.aws_object.id] }
+          },
+          convergence_options: {
+              chef_version: node['buildcluster']['chef_client_version'],
+              ssl_verify_mode: :verify_none
+          }
+      })
+      end
+  end
 end
 
 #
@@ -104,8 +106,8 @@ load_balancer "chef-aws-elb" do
     health_check: {
       healthy_threshold:    2,
       unhealthy_threshold:  4,
-      interval:             12,
-      timeout:              5,
+      interval:             5,
+      timeout:              2,
       target:               'HTTP:80/'
     },
     subnets: lazy { [web_subnet.aws_object.id] },

@@ -8,9 +8,8 @@ default['buildcluster']['aws_region'] = ENV['AWS_DEFAULT_REGION'] || 'us-west-2'
 
 #
 ## machine details
-# Determine AMI by AWS Region this is the default Ubuntu AMI for us-west-2
-# and us-east-1 as of April 30, 2016
-default['buildcluster']['image_id'] = node['buildcluster']['aws_region'] == 'us-west-2' ? 'ami-9abea4fb' : 'ami-fce3c696'
+# Use the node['ec2']['ami_id'] of the workstation as the AMI for all of our nodes
+default['buildcluster']['image_id'] = node['ec2']['ami_id'] || 'ami-9abea4fb'
 default['buildcluster']['instance_type'] = 't2.micro'
 
 # Version of chef_client to installed
