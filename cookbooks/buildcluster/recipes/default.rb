@@ -11,13 +11,11 @@ with_driver "aws::#{node['buildcluster']['aws_region']}"
 #
 ## Get the knife credentials to use for chef-provisioning
 ## and set our target chef_environment
-creds = getKnifeCreds 'Reading Knife Creds' do
-  chef_dir node['buildcluster']['chef_dir']
-end
+Chef::Config.from_file("#{node['buildcluster']['chef_dir']}/knife.rb")
 
-with_chef_server creds['chef_server_url'],
-  :client_name => creds['node_name'],
-  :signing_key_filename => creds['client_key']
+with_chef_server Chef::Config[:chef_server_url],
+  :client_name => Chef::Config[:node_name],
+  :signing_key_filename => Chef::Config[:client_key]
 
 with_chef_environment node['buildcluster']['chef_environment']
 
@@ -92,7 +90,7 @@ end
 
 #
 ## Add the newly minted webservers into our load_balancer
-load_balancer "chef-aws-elb" do
+my_elb = load_balancer "chef-aws-elb" do
   machines (1..node['buildcluster']['num_web_instances']).map { |inst| "web#{inst}" }
   load_balancer_options({
     :listeners => [{
@@ -112,4 +110,11 @@ load_balancer "chef-aws-elb" do
     security_groups: lazy { [web_sg.aws_object.id] }
 
   })
+end
+
+#
+## Print the Public DNS of the newly created ELB
+log 'Print ELB Address' do
+  message lazy { "AWS ELB Public Address: #{[my_elb.aws_object.dns_name]}" }
+  level :info
 end

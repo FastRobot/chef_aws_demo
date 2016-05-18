@@ -9,13 +9,11 @@ require 'chef/provisioning/aws_driver'
 # Pick your aws region
 with_driver "aws::#{node['buildcluster']['aws_region']}"
 
-creds = getKnifeCreds 'Reading Knife Creds' do
-  chef_dir node['buildcluster']['chef_dir']
-end
+Chef::Config.from_file("#{node['buildcluster']['chef_dir']}/knife.rb")
 
-with_chef_server creds['chef_server_url'],
-  :client_name => creds['node_name'],
-  :signing_key_filename => creds['client_key']
+with_chef_server Chef::Config[:chef_server_url],
+  :client_name => Chef::Config[:node_name],
+  :signing_key_filename => Chef::Config[:client_key]
 
 # Delete the machines
 machine 'db1' do
@@ -35,6 +33,20 @@ end
 # Purge the VPC to remove subnets and security groups
 aws_vpc 'chef-aws-vpc' do
   action :purge
+end
+
+# Delete the Security Groups
+['chef-aws-db-sg','chef-aws-web-sg'].each do |sg|
+  aws_security_group sg do
+    action :delete
+  end
+end
+
+# Delete the Subnets
+['chef-aws-db-subnet','chef-aws-web-subnet'].each do |sn|
+  aws_subnet sn do
+    action :delete
+  end
 end
 
 # Now delete the empty VPC
