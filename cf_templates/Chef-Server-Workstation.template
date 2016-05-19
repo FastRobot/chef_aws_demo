@@ -376,6 +376,11 @@
                   "Ref": "ChefWorkstationSecurityGroup"
                 },
                 "' >> /home/ubuntu/.bash_profile\n",
+                "echo 'export CHEF_KMS_KEYID=",
+                {
+                  "Ref": "ChefMasterKey"
+                },
+                "' >> /home/ubuntu/.bash_profile\n",
                 "chown -R ubuntu:ubuntu /home/ubuntu\n",
                 "curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",\"Reason\" : \"Configuration Complete\",\"UniqueId\" : \"ChefWorkstation\", \"Data\" : \"Done\"}' \"",
                 {
