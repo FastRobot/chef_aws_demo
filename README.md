@@ -16,6 +16,9 @@ From there you may explore a sample web application backed by a redis datastore,
 Once you are happy with your tested changes, you can use a different cookbook to automatically deploy the
 sampleApp to EC2 instances that chef will provision for you, put into different secure subnets and register 
 with an ELB for redundancy.
+
+Finally, there is an included cleanupLambda cookbook which sets up a lambda process to clean up
+chef objects for instances as they are terminated.
  
 ## Usage 
 
@@ -148,7 +151,17 @@ number of nodes you selected.
 5. The Workstation downloads the knife credentials from your chef server and clones some cookbooks down
 6. All done, login to the workstation as user ubuntu and cd to the chef-repo directory.
 
-TODO
-rename buildcluster to sampleAppDeploy and put in public repo
-add berks install/upload to cf template
+Additionally we've written a basic cookbook wrapper around the lambda for node cleanup, based off
+of the excellent work here: 
 
+https://aws.amazon.com/blogs/apn/automatically-delete-terminated-instances-in-chef-server-with-aws-lambda-and-cloudwatch-events/
+
+Our cleanupLambda cookbook is meant to be run from the workstation as:
+
+```
+ubuntu@ip-172-31-2-78:~/chef-repo$ sudo chef-client --local-mode -r "cleanupLambda"
+```
+
+this cookbook relies heavily on environment variables set via user-data when we created the workstation, so 
+while it runs here, if you wanted to extract the cookbook and use it elsewhere you'd need to clean it up
+a bit and carefully look at the assumptions we make as we set attributes.
