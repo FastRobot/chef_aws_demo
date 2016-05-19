@@ -313,7 +313,8 @@
               [
                 "#!/bin/bash -xe\n",
                 "apt-get update\n",
-                "apt-get -y install git unzip awscli jq\n",
+                "apt-get -y install git unzip python-pip jq\n",
+                "pip install awscli\n",
                 "cd /tmp\n",
                 "curl -LO https://packages.chef.io/stable/ubuntu/12.04/chefdk_0.12.0-1_amd64.deb\n",
                 "dpkg -i /tmp/chefdk_0.12.0-1_amd64.deb\n",
@@ -494,6 +495,43 @@
             "Ref": "RootRole"
           }
         ]
+      }
+    },
+    "ChefMasterKey": {
+      "Type" : "AWS::KMS::Key",
+      "Properties" : {
+        "Description" : "protects a chef user key",
+        "KeyPolicy" : {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "Required /root",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": { "Fn::Join" : [
+                  "",
+                  [
+                  "arn:aws:iam::",
+                  { "Ref": "AWS::AccountId" },
+                  ":root"
+                  ]
+                ]
+                }
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "Enable IAM User Permissions",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": { "Fn::GetAtt" : ["RootRole", "Arn"] }
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+            }
+          ]
+        }
       }
     }
   },
