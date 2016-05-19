@@ -37,4 +37,37 @@ end
 # CHEF_SERVER_URL = 'https://your.domain/organizations/your_organization'
 # USERNAME = 'CHEF_USER'
 
+# pam_config = "/etc/pam.d/su"
+# commented_limits = /^#\s+(session\s+\w+\s+pam_limits\.so)\b/m
+#
+# ruby_block "add pam_limits to su" do
+#   block do
+#     sed = Chef::Util::FileEdit.new(pam_config)
+#     sed.search_file_replace(commented_limits, '\1')
+#     sed.write_file
+#   end
+#   only_if { ::File.readlines(pam_config).grep(commented_limits).any? }
+# end if platform_family?('debian')
+
 # after that, while terrible, I could install terraform and use it to install the lambda
+
+remote_file "#{Chef::Config[:file_cache_path]}/terraform.zip" do
+  source "https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_linux_amd64.zip"
+  notifies :run, "execute[unpack terraform]"
+end
+
+directory "/opt/terraform"
+
+execute "unpack terraform" do
+  cwd "/opt/terraform"
+  command "unzip #{Chef::Config[:file_cache_path]}/terraform.zip"
+  action :nothing
+end
+
+package "zip"
+
+# create the zip file
+# zip -r lambda_function_payload.zip lambda
+
+# apply the zipfile
+# terraform apply terraform
