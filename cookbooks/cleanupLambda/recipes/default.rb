@@ -67,7 +67,11 @@ end
 package "zip"
 
 # create the zip file
-# zip -r lambda_function_payload.zip lambda
+execute "create lambda payload zip" do
+  cwd "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda"
+  command "zip -r ../lambda_function_payload.zip ."
+end
+
 
 # apply the zipfile
 # terraform apply terraform

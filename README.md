@@ -1,6 +1,6 @@
 # Chef marketplace AWS demo
 
-This is a code demonstration of one way to use Chef and AWS in a harmonious fashion.
+This is a demonstration of one way to use Chef and AWS in a harmonious fashion.
 
 It uses a CloudFormation template to build a licensed Chef server using the marketplace AMI as well as
 an Ubuntu 14.04 workstation. 
@@ -18,7 +18,8 @@ sampleApp to EC2 instances that chef will provision for you, put into different 
 with an ELB for redundancy.
 
 Finally, there is an included cleanupLambda cookbook which sets up a lambda process to clean up
-chef objects for instances as they are terminated.
+chef objects for instances as they are terminated.  the cleanupLambda cookbook is very basic and simply 
+attempts to automate the instructions from a previous AWS demo about setting up a lambda
  
 ## Usage 
 
@@ -27,7 +28,7 @@ included Chef-Server-Workstation.template.
 
 Fill out all the parameters.
 
-On the final launch page, don't forget to OK the creation of IAM roles via the checkbox at the bottom.
+On the pre-launch page, don't forget to OK the creation of IAM roles via the checkbox at the bottom.
 
 Find the public hostname or IP of the ChefWorkstation machine and ssh into it as user ubuntu, 
 using the key you specified when you created the above stack. If you'd like buildcluster or test kitchen to work,
@@ -136,7 +137,26 @@ Note that the teardown will attempt to destroy all the machines you built via th
 the created vpc (named 'chef-aws-vpc') and purge all remaining subnet and network objects in it. Not only will this
 kill you, it will hurt the entire time you are dying.
 
+And if you'd like to experiment with the lambda, follow the instructions here:
 
+https://github.com/awslabs/lambda-chef-node-cleanup
+
+Then you can verify the working behavior via the following steps:
+
+```
+ubuntu@ip-172-31-43-49:~/chef-repo$ knife bootstrap -x ec2-user --sudo ec2-52-38-202-117.us-west-2.compute.amazonaws.com
+Doing old-style registration with the validation key at /home/ubuntu/chef-repo/.chef/thistrain-validator.pem...
+```
+
+Verify that the node was created and registered with the chef server:
+
+```
+ubuntu@ip-172-31-43-49:~/chef-repo$ knife node list
+ip-172-31-8-25.us-west-2.compute.internal
+```
+
+Now delete the node from the AWS console, then verify that the lambda cleaned up the node and client object for
+our terminated AWS node.
 
 # Behind the scenes
 
