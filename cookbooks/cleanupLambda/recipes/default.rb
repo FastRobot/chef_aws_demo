@@ -32,7 +32,7 @@ file "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda/encrypte
   action :create_if_missing
 end
 
-file "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda/local_config.py" do
+template "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda/local_config.py" do
   variables({
       :chef_server_url => Chef::Config[:chef_server_url],
       :region => ENV['AWS_DEFAULT_REGION'],

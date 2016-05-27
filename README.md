@@ -2,8 +2,16 @@
 
 This is a demonstration of one way to use Chef and AWS in a harmonious fashion.
 
-It uses a CloudFormation template to build a licensed Chef server using the marketplace AMI as well as
+There's a CloudFormation template to build the initial set of a AWS marketplace Chef Server and
+linked workstation, then three cookbooks:
+
+* sampleApp - a sinatra ruby app with a redis datastore, testable with kitchen
+* buildcluster - a chef provisioning recipe to setup AWS infrastructure and networking and deploy sampleApp
+* cleanupLambda - a quick and dirty cookbook to deploy a lambda which will clean terminated instances from the chef server
+
+Use the CloudFormation template to build a licensed Chef server using the marketplace AMI as well as
 an Ubuntu 14.04 workstation. 
+
 The server is preconfigured with your account and new organization and lives behind an EIP. 
 
 The workstation is automatically linked to the chef server, pulls down some sample cookbooks and repos, 
