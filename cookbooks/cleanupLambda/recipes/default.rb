@@ -45,7 +45,6 @@ end
 
 remote_file "#{Chef::Config[:file_cache_path]}/terraform.zip" do
   source "https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_linux_amd64.zip"
-  notifies :run, "execute[unpack terraform]"
 end
 
 directory "#{Chef::Config[:file_cache_path]}/terraform"
@@ -53,7 +52,7 @@ directory "#{Chef::Config[:file_cache_path]}/terraform"
 execute "unpack terraform" do
   cwd "#{Chef::Config[:file_cache_path]}/terraform"
   command "unzip #{Chef::Config[:file_cache_path]}/terraform.zip"
-  action :nothing
+  creates "#{Chef::Config[:file_cache_path]}/terraform/terraform"
 end
 
 # create the zip file
