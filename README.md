@@ -145,11 +145,34 @@ Note that the teardown will attempt to destroy all the machines you built via th
 the created vpc (named 'chef-aws-vpc') and purge all remaining subnet and network objects in it. Not only will this
 kill you, it will hurt the entire time you are dying.
 
-And if you'd like to experiment with the lambda, follow the instructions here:
+We've also taken the awslabs example lambda to clean up chef objects after instance termination and written
+a cookbook around it to automate the install. You can see the original code and readme here:
 
 https://github.com/awslabs/lambda-chef-node-cleanup
 
-Then you can verify the working behavior via the following steps:
+To use our wrapper, invoke it in a similar fashion to the buildcluster cookbook
+
+```
+ubuntu@ip-172-31-2-78:~/chef-repo$ chef-client --local-mode -r cleanupLambda
+```
+
+There's a variable delay between when the terraform creates the chef_node_cleanup_lambda role and when that role
+has propagated enough that we can add it to the kms key policy for our ChefMasterKey. We've attempted to account
+for this by adding a execute delay block of 30s, but in some tests it took longer and I had to re-run the 
+above chef-client/cleanupLambda cookbook. You can see the 404 returned in the ruby block if it fails, or
+otherwise you can run
+
+```
+ubuntu@ip-172-31-33-119:~/chef-repo$ aws kms get-key-policy --key-id $CHEF_KMS_KEYID --policy default
+```
+
+and check that the output contains "arn:aws:iam::ACCOUNT_ID:role/chef_node_cleanup_lambda"
+
+Note that this cookbook relies heavily on environment variables set via user-data when we created the workstation,
+so while it runs here, if you wanted to extract the cookbook and use it elsewhere you'd need to clean it up
+a bit and carefully look at the assumptions we make as we set attributes.
+
+To test, either create nodes from the build cluster above or manually an additional instance and bootstrap it:
 
 ```
 ubuntu@ip-172-31-43-49:~/chef-repo$ knife bootstrap -x ec2-user --sudo ec2-52-38-202-117.us-west-2.compute.amazonaws.com
@@ -164,7 +187,7 @@ ip-172-31-8-25.us-west-2.compute.internal
 ```
 
 Now delete the node from the AWS console, then verify that the lambda cleaned up the node and client object for
-our terminated AWS node.
+our terminated AWS node. (via knife client list and knife node list)
 
 # Behind the scenes
 
@@ -184,12 +207,3 @@ of the excellent work here:
 
 https://aws.amazon.com/blogs/apn/automatically-delete-terminated-instances-in-chef-server-with-aws-lambda-and-cloudwatch-events/
 
-Our cleanupLambda cookbook is meant to be run from the workstation as:
-
-```
-ubuntu@ip-172-31-2-78:~/chef-repo$ sudo chef-client --local-mode -r "cleanupLambda"
-```
-
-this cookbook relies heavily on environment variables set via user-data when we created the workstation, so 
-while it runs here, if you wanted to extract the cookbook and use it elsewhere you'd need to clean it up
-a bit and carefully look at the assumptions we make as we set attributes.
