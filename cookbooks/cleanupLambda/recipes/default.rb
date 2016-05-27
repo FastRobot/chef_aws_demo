@@ -73,11 +73,26 @@ execute "terraform apply" do
   #action :nothing
 end
 
+log "sleeping for 30s to allow the new role to propagate"
+
+execute "sleep 30"
+
 # grab the key policy and make sure the lambda is allowed to use the key
-ruby
-
-# aws kms get-key-policy --key-id #{node['cleanupLambda']['key_id']} --policy-name default --output text
-# require 'json'
-#
-
-# aws kms put-key-policy --key-id #{node['cleanupLambda']['key_id']} --policy-name default --generate-cli-skeleton
+ruby_block "add lambda role to key policy" do
+  block do
+    require 'json'
+    get_cmd = "aws kms get-key-policy --key-id #{node['cleanupLambda']['key_id']} --policy-name default --output text"
+    key_policy = JSON.parse(Mixlib::ShellOut.new(get_cmd).run_command.stdout)
+    account_id = key_policy["Statement"][0]["Principal"]["AWS"][/[0-9]+/]
+    key_policy["Statement"] << {"Sid"=>"Enable Lambda KMS Permissions",
+                                "Effect"=>"Allow",
+                                "Principal"=>{"AWS"=>"arn:aws:iam::#{account_id}:role/chef_node_cleanup_lambda"},
+                                "Action"=>"kms:*", "Resource"=>"*"}
+    key_policy["Statement"].uniq!
+    new_policy = key_policy.to_json
+    put_policy_cmd = "aws kms put-key-policy --key-id #{node['cleanupLambda']['key_id']} " +
+        "--policy-name default --policy '" + new_policy + "'"
+    put_policy = Mixlib::ShellOut.new(put_policy_cmd)
+    put_policy.run_command
+  end
+end
