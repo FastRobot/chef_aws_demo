@@ -56,8 +56,6 @@ execute "unpack terraform" do
   action :nothing
 end
 
-package "zip"
-
 # create the zip file
 execute "create lambda payload zip" do
   cwd "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda"
