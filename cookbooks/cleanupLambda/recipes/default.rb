@@ -32,34 +32,26 @@ file "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda/encrypte
   action :create_if_missing
 end
 
-# need to modify the file lambda/main.py
-# REGION= 'us-west-2' # Change to region your AWS Lambda function is in
-# CHEF_SERVER_URL = 'https://your.domain/organizations/your_organization'
-# USERNAME = 'CHEF_USER'
+file "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda/local_config.py" do
+  variables({
+      :chef_server_url => Chef::Config[:chef_server_url],
+      :region => ENV['AWS_DEFAULT_REGION'],
+      :chef_username => Chef::Config[:node_name]
+            })
+  action :create
+end
 
-# pam_config = "/etc/pam.d/su"
-# commented_limits = /^#\s+(session\s+\w+\s+pam_limits\.so)\b/m
-#
-# ruby_block "add pam_limits to su" do
-#   block do
-#     sed = Chef::Util::FileEdit.new(pam_config)
-#     sed.search_file_replace(commented_limits, '\1')
-#     sed.write_file
-#   end
-#   only_if { ::File.readlines(pam_config).grep(commented_limits).any? }
-# end if platform_family?('debian')
-
-# after that, while terrible, I could install terraform and use it to install the lambda
+# Install terraform and use it to install the lambda
 
 remote_file "#{Chef::Config[:file_cache_path]}/terraform.zip" do
   source "https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_linux_amd64.zip"
   notifies :run, "execute[unpack terraform]"
 end
 
-directory "/opt/terraform"
+directory "#{Chef::Config[:file_cache_path]}/terraform"
 
 execute "unpack terraform" do
-  cwd "/opt/terraform"
+  cwd "#{Chef::Config[:file_cache_path]}/terraform"
   command "unzip #{Chef::Config[:file_cache_path]}/terraform.zip"
   action :nothing
 end
@@ -70,8 +62,22 @@ package "zip"
 execute "create lambda payload zip" do
   cwd "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda"
   command "zip -r ../lambda_function_payload.zip ."
+  creates "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup/lambda_function_payload.zip"
+  #notifies :execute, "execute[terraform apply]"
 end
 
-
-# apply the zipfile
 # terraform apply terraform
+execute "terraform apply" do
+  cwd "#{Chef::Config[:file_cache_path]}/lambda-chef-node-cleanup"
+  command "#{Chef::Config[:file_cache_path]}/terraform/terraform apply terraform"
+  #action :nothing
+end
+
+# grab the key policy and make sure the lambda is allowed to use the key
+ruby
+
+# aws kms get-key-policy --key-id #{node['cleanupLambda']['key_id']} --policy-name default --output text
+# require 'json'
+#
+
+# aws kms put-key-policy --key-id #{node['cleanupLambda']['key_id']} --policy-name default --generate-cli-skeleton
