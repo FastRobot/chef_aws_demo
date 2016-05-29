@@ -1,0 +1,7 @@
+name 'cleanupLambda'
+maintainer 'Fast Robot, LLC'
+maintainer_email 'cookbooks@fastrobot.com'
+license 'apache2'
+description 'Installs/Configures cleanupLambda'
+long_description 'Installs/Configures cleanupLambda'
+version '0.1.0'
