@@ -34,6 +34,9 @@ attempts to automate the instructions from a previous AWS demo about setting up 
 Go to the AWS cloudformation console in any region and build a stack from the 
 included Chef-Server-Workstation.template.
 
+Note that because the marketplace Chef Server is only in us-west-2 and us-east-1, this CF template will only
+work in those regions.
+
 Fill out all the parameters.
 
 On the pre-launch page, don't forget to OK the creation of IAM roles via the checkbox at the bottom.
@@ -77,22 +80,17 @@ ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$ kitchen test
 ...
 -----> serverspec installed (version 2.31.1)
        /opt/chef/embedded/bin/ruby -I/tmp/verifier/suites/serverspec -I/tmp/verifier/gems/gems/rspec-support-3.4.1/lib:/tmp/verifier/gems/gems/rspec-core-3.4.4/lib /opt/chef/embedded/bin/rspec --pattern /tmp/verifier/suites/serverspec/\*\*/\*_spec.rb --color --format documentation --default-path /tmp/verifier/suites/serverspec
-
        Port "9000"
          should be listening
          should be listening with tcp
-
        Command "wget -qO- http://localhost:9000"
          stdout
            should match /This page has been accessed [0-9]+ times/
-
        Command "wget -qO- http://localhost:80"
          stdout
            should match /This page has been accessed [0-9]+ times/
-
        Finished in 0.11535 seconds (files took 0.26965 seconds to load)
        4 examples, 0 failures
-
        Finished verifying <default-ubuntu-1404> (0m8.37s).
 -----> Destroying <default-ubuntu-1404>...
        EC2 instance <i-fb9d8d3c> destroyed.
@@ -101,8 +99,6 @@ ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$ kitchen test
 -----> Kitchen is finished. (3m13.11s)
 ubuntu@ip-172-31-2-78:~/chef-repo/cookbooks/sampleApp$
 ```
-
-
 
 You could have also cloned the repo to your local computer and run the same kitchen test, which would have noted 
 the lack of AWS/EC2 environment variables and used the vagrant driver instead.
@@ -135,6 +131,12 @@ ubuntu@ip-172-31-4-121:~/chef-repo$ aws elb describe-load-balancers --query Load
 "chef-aws-elb-752615793.us-west-2.elb.amazonaws.com"
 ```
 
+Or of course the last resource of the buildcluster cookbook logs the same info:
+
+```
+[2016-05-27T19:11:13+00:00] INFO: AWS ELB Public Address: ["chef-aws-elb-752615793.us-west-2.elb.amazonaws.com"]
+```
+
 When you are finished with these examples, don't forget to clean up after yourself to prevent unnecessary
 charges.
 
@@ -142,8 +144,8 @@ charges.
 ubuntu@ip-172-31-2-78:~/chef-repo$ chef-client --local-mode -r "buildcluster::teardown"
 ```
 Note that the teardown will attempt to destroy all the machines you built via the buildcluster and destroy
-the created vpc (named 'chef-aws-vpc') and purge all remaining subnet and network objects in it. Not only will this
-kill you, it will hurt the entire time you are dying.
+the created vpc (named 'chef-aws-vpc') and purge all remaining subnet and network objects in it. Not only 
+will this kill you, it will hurt the entire time you are dying.
 
 We've also taken the awslabs example lambda to clean up chef objects after instance termination and written
 a cookbook around it to automate the install. You can see the original code and readme here:
@@ -187,7 +189,8 @@ ip-172-31-8-25.us-west-2.compute.internal
 ```
 
 Now delete the node from the AWS console, then verify that the lambda cleaned up the node and client object for
-our terminated AWS node. (via knife client list and knife node list)
+our terminated AWS node. (via knife client list and knife node list). Look too the cloudwatch logs for that
+lambda to see what is happening or debug any issues.
 
 # Behind the scenes
 
